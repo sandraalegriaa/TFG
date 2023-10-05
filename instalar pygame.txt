@@ -1,0 +1,15 @@
+python -m pip install -U pygame==2.5.2 --user
+
+pagina de donde saqué el link: https://www.pygame.org/news
+
+
+
+Pagina para ver funciones de pygame: 
+
+https://www.pygame.org/docs/ref/display.html
+
+
+ASSETS: https://dimexel.itch.io/classic-board-game
+
+
+SPRITE SHEET: https://www.pygame.org/wiki/Spritesheet
