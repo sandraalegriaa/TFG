@@ -14,15 +14,17 @@ DIM_CELDA = DIM_TABLERO / CELDAS
 DIM_FICHA = DIM_CELDA
 
 #Imagenes
-IMG_TABLERO = "./Assets/Board-othello.png"
-IMG_FICHA_BLANCA = "./Assets/Pieza-blanca.png"
-IMG_FICHA_NEGRA = "./Assets/Pieza-negra.png"
+IMG_TABLERO = "../Assets/Board-othello.png"
+IMG_FICHA_BLANCA = "../Assets/Pieza-blanca.png"
+IMG_FICHA_NEGRA = "../Assets/Pieza-negra.png"
 
 #Colores RGB
-BLANCO = (255,255,255)
-NEGRO = (0,0,0)
+BLANCO_RGB = (255,255,255)
+NEGRO_RGB = (0,0,0)
 
 #Jugadores
+BLANCO = 2
+NEGRO = 1
 P1 = 1
 P2 = 2
 

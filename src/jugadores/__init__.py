@@ -1,0 +1,1 @@
+from .JugadorHumano import JugadorHumano
