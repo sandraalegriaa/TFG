@@ -2,7 +2,7 @@ from typing import Protocol
 from dataclasses import dataclass
 
 @dataclass
-class Jugador(Protocol):
+class IJugador(Protocol):
     """Clase Abstracta base del Jugador"""
     color: int
     turno: int

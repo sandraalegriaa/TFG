@@ -5,6 +5,8 @@ import pygame as pg
 import sys
 import math as m
 
+from motores import IMotorDeJuego
+
 @dataclass
 class Interfaz ():
 
@@ -82,7 +84,6 @@ class Interfaz ():
         
         return asset
     
-    
     def deCeldaAPixel(self, fila, columna):
         """Transformar una celda en coordenadas (x,y)"""
 
@@ -98,8 +99,26 @@ class Interfaz ():
         columna = m.floor(((pos[0] - c.ORIGEN_TABLERO['x']) / c.DIM_CELDA))
 
         return fila,columna
+            
+    def colocarFicha(self,ficha,fila,columna):
+        """Colocar la ficha en el tablero y actualizar el tablero para que se visualice correctamente"""
 
-    def gestionEventos(self, motor):
+        self._ventana.blit(ficha, (c.ORIGEN_TABLERO['x'] + columna * c.DIM_CELDA,c.ORIGEN_TABLERO['y'] + fila * c.DIM_CELDA))
+        pg.display.update()
+
+    def obtenerFichaJugador(self, motor : IMotorDeJuego):
+        """"Obtener asset de la ficha correspondiente al jugador activo"""
+
+        jugadorActivo = motor.getJugadorActivo()
+
+        if (jugadorActivo.getColor() == c.NEGRO):
+            ficha = self._asset_negra
+        else:
+            ficha = self._asset_blanca
+    
+        return ficha
+
+    def gestionEventos(self, motor: IMotorDeJuego):
         """Gestionar eventos en la interfaz"""
 
         for event in pg.event.get():
@@ -114,17 +133,21 @@ class Interfaz ():
                 if (pos != None):
                     #Obtener celda
                     fila, columna = self.obtenerCelda(pos)
-                    
+                    print(pos)
+                    print()
                     #Colocacion de las fichas
                     if (motor.dentroCeldas(fila,columna) and motor.obtenerValorCelda(fila,columna) == 0):
                         
-                        if (self.adyacencia(fila,columna)):
+                        if (motor.adyacencia(fila,columna)):
+
                             #Indicar que jugador coloca la ficha en la matriz
-                            motor.modificarValorCelda(fila,columna,self._jugadorActivo.getTurno())
+
+                            motor.modificarValorCelda(fila,columna,motor.getJugadorActivo().getTurno())
 
                             #Colocar ficha del jugador
-                            ficha = self.obtenerFichaJugador()
+                            ficha = self.obtenerFichaJugador(motor)
                             self.colocarFicha(ficha,fila,columna)       
+                            motor.cambiarTurno(motor.getJugadorActivo())
 
                             #BORRAR AL ACABAR
                             print(motor.getTablero())
