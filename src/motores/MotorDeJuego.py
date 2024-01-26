@@ -109,55 +109,17 @@ class MotorDeJuego ():
 
         return contrario
 
-    def posibleColocacion(self,fila,columna):
-        """Comprueba si la colocación es posible:
-            - True cuando se encierran fichas
-            - False en caso contrario
-        """
-
-        valorContrario = self.obtenerValorContario(self.getJugadorActivo().getTurno())
-        valorJugador = self.getJugadorActivo().getTurno()
-
-        # Arriba, Abajo, Izquierda, Derecha, DiagonalArribaIzquierda, DiagonalArribaDerecha, DiagonalAbajoIzquierda, DiagonalAbajoDerecha
-        direcciones = [(0, -1), (0, 1), (-1, 0), (1, 0),(-1, -1),(-1, 1),(-1, 1),(1, 1)]  
-        for dx, dy in direcciones:
-            celdas = []
-            x, y = fila, columna
-            while True:
-                x += dx
-                y += dy
-                if x < 0 or x >= c.CELDAS or y < 0 or y >= c.CELDAS:
-                    break
-                valor = self.obtenerValorCelda(x, y)
-                if valor == valorContrario:
-                    celdas.append([x, y])
-                elif valor == valorJugador:
-                    if len(celdas) > 0:
-                        return True
-                elif valor == 0:
-                    break
-
-        return False
-
     def fichasContrariasEncerradas(self,filaColocacion,columnaColocacion):
         """Determinar que celdas han sido encerradas tras la colocación y cambiar su valor"""
         celdasEncerradas = []
         celdas = []
 
-        print()
-        print("FICHAS ENCERRADAS")
-        print() 
-        print(f"filaColocacion= {filaColocacion}, columnaColocacion={columnaColocacion}")
-
         valorContrario = self.obtenerValorContario(self.getJugadorActivo().getTurno())
         valorJugador = self.getJugadorActivo().getTurno()
 
-        print(f"valorContarior= {valorContrario}, valorJugador={valorJugador}")
-        print()
-
         # Rectas
         # Arriba, Abajo, Izquierda, Derecha, DiagonalArribaIzquierda, DiagonalArribaDerecha, DiagonalAbajoIzquierda, DiagonalAbajoDerecha
-        direcciones = [(0, -1), (0, 1), (-1, 0), (1, 0),(-1, -1),(-1, 1),(-1, 1),(1, 1)]  
+        direcciones = [(0, -1), (0, 1), (-1, 0), (1, 0),(-1, -1),(-1, 1),(1, -1),(1, 1)]  
         for dx, dy in direcciones:
             celdas = []
             x, y = filaColocacion, columnaColocacion

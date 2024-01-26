@@ -147,7 +147,10 @@ class Interfaz ():
                     #Colocacion de las fichas
                     if (motor.dentroCeldas(fila,columna) and motor.obtenerValorCelda(fila,columna) == 0):
                         
-                        if (motor.posibleColocacion(fila,columna)):
+                        #Comprobar si hay fichas que han quedado encerradas
+                        celdas = motor.fichasContrariasEncerradas(fila,columna)
+
+                        if (len(celdas) > 0):
 
                             #Indicar que jugador coloca la ficha en el tablero
                             motor.modificarValorCelda(fila,columna,motor.getJugadorActivo().getTurno())
@@ -156,10 +159,6 @@ class Interfaz ():
                             ficha = self.obtenerFichaJugador(motor)
                             self.colocarFicha(ficha,fila,columna)       
 
-                            #Comprobar si hay fichas que han quedado encerradas
-                            celdas = motor.fichasContrariasEncerradas(fila,columna)
-                            print("CELDAS:")
-                            print(celdas)
                             motor.cambiarValorFichasEncerradas(celdas)
                             self.cambiarFichasEncerradas(motor, celdas)
 
