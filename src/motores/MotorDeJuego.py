@@ -148,8 +148,58 @@ class MotorDeJuego ():
             adyacente = True
 
         return adyacente
-
     
+    def obtenerValorContario(self,turno):
+        """Obtener el valor de turno del contrario"""
+        
+        if turno == c.P1:
+            contrario = c.P2
+        else: 
+            contrario = c.P1
 
-    
+        return contrario
 
+
+    def fichasContrariasEncerradas(self,filaColocacion,columnaColocacion):
+        """Determinar que celdas han sido encerradas tras la colocación y cambiar su valor"""
+        celdasEncerradas = []
+        celdas = []
+
+        print()
+        print("FICHAS ENCERRADAS")
+        print() 
+        print(f"filaColocacion= {filaColocacion}, columnaColocacion={columnaColocacion}")
+
+        valorContrario = self.obtenerValorContario(self.getJugadorActivo().getTurno())
+        valorJugador = self.getJugadorActivo().getTurno()
+
+        print(f"valorContarior= {valorContrario}, valorJugador={valorJugador}")
+        print()
+
+        # Rectas
+        # Arriba, Abajo, Izquierda, Derecha, DiagonalArribaIzquierda, DiagonalArribaDerecha, DiagonalAbajoIzquierda, DiagonalAbajoDerecha
+        direcciones = [(0, -1), (0, 1), (-1, 0), (1, 0),(-1, -1),(-1, 1),(-1, 1),(1, 1)]  
+        for dx, dy in direcciones:
+            celdas = []
+            x, y = filaColocacion, columnaColocacion
+            while True:
+                x += dx
+                y += dy
+                if x < 0 or x >= c.CELDAS or y < 0 or y >= c.CELDAS:
+                    break
+                valor = self.obtenerValorCelda(x, y)
+                if valor == valorContrario:
+                    celdas.append([x, y])
+                elif valor == valorJugador:
+                    celdasEncerradas.extend(celdas)
+                    break
+                elif valor == 0:
+                    break
+
+        return celdasEncerradas
+
+    def cambiarValorFichasEncerradas(self,celdas):
+        for celda in celdas:
+            fila, columna = celda[0], celda[1]
+            valor = self.obtenerValorCelda(fila,columna)
+            self.modificarValorCelda(fila,columna,self.obtenerValorContario(valor))

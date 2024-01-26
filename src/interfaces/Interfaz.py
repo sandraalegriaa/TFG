@@ -117,6 +117,15 @@ class Interfaz ():
             ficha = self._asset_blanca
     
         return ficha
+    
+    def cambiarFichasEncerradas(self, motor: IMotorDeJuego, celdas):
+        """Cambiar assets de las fichas encerradas por las fichas del jugador actual"""
+
+        ficha = self.obtenerFichaJugador(motor)
+
+        for [fila,columna] in celdas:
+            self.colocarFicha(ficha,fila,columna)
+
 
     def gestionEventos(self, motor: IMotorDeJuego):
         """Gestionar eventos en la interfaz"""
@@ -140,13 +149,21 @@ class Interfaz ():
                         
                         if (motor.adyacencia(fila,columna)):
 
-                            #Indicar que jugador coloca la ficha en la matriz
-
+                            #Indicar que jugador coloca la ficha en el tablero
                             motor.modificarValorCelda(fila,columna,motor.getJugadorActivo().getTurno())
 
                             #Colocar ficha del jugador
                             ficha = self.obtenerFichaJugador(motor)
                             self.colocarFicha(ficha,fila,columna)       
+
+                            #Comprobar si hay fichas que han quedado encerradas
+                            celdas = motor.fichasContrariasEncerradas(fila,columna)
+                            print("CELDAS:")
+                            print(celdas)
+                            motor.cambiarValorFichasEncerradas(celdas)
+                            self.cambiarFichasEncerradas(motor, celdas)
+
+                            #Turno del siguiente jugador
                             motor.cambiarTurno(motor.getJugadorActivo())
 
                             #BORRAR AL ACABAR
