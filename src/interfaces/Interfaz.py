@@ -147,7 +147,7 @@ class Interfaz ():
                     #Colocacion de las fichas
                     if (motor.dentroCeldas(fila,columna) and motor.obtenerValorCelda(fila,columna) == 0):
                         
-                        if (motor.adyacencia(fila,columna)):
+                        if (motor.posibleColocacion(fila,columna)):
 
                             #Indicar que jugador coloca la ficha en el tablero
                             motor.modificarValorCelda(fila,columna,motor.getJugadorActivo().getTurno())

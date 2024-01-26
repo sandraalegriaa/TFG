@@ -98,56 +98,6 @@ class MotorDeJuego ():
 
         while(True):
             interfaz.gestionEventos(self)
-
-    def adyacencia (self,fila,columna):
-        """Comprueba la adyacencia de la celda seleccionada por el jugador activo con las fichas del rival en las ocho posibles direcciones (a una celda de distancia)"""
-
-        adyp2 = False
-        adyp1 = False
-
-        adyacente = False
-        
-        #Borde superior del tablero
-        if (not ((fila-1) < 0)):
-            adyp2 = self._tablero[fila-1][columna] == c.P2
-            adyp1 = self._tablero[fila-1][columna] == c.P1
-            #Esquina superior izquierda
-            if (not ((columna - 1) < 0)):
-                adyp2 = adyp2 or self._tablero[fila-1][columna-1] == c.P2
-                adyp1 = adyp1 or self._tablero[fila-1][columna-1] == c.P1
-            #Esquina superior izquierda
-            if (not ((columna + 1) >= c.CELDAS)):
-                adyp2 = adyp2 or self._tablero[fila-1][columna+1] == c.P2
-                adyp1 = adyp1 or self._tablero[fila-1][columna+1] == c.P1
-        
-        #Borde inferior del tablero
-        if (not ((fila + 1) >= c.CELDAS)):
-            adyp2 = adyp2 or self._tablero[fila+1][columna] == c.P2 
-            adyp1 = adyp1 or self._tablero[fila+1][columna] == c.P1 
-            #Esquina inferior izquierda
-            if (not ((columna - 1) < 0)):
-                adyp2 = adyp2 or self._tablero[fila+1][columna-1] == c.P2
-                adyp1 = adyp1 or self._tablero[fila+1][columna-1] == c.P1
-            #Esquina inferior derecha
-            if (not ((columna + 1) >= c.CELDAS)):
-                adyp2 = adyp2 or self._tablero[fila+1][columna+1] == c.P2
-                adyp1 = adyp1 or self._tablero[fila+1][columna+1] == c.P1
-
-        #Borde izquierdo del tablero
-        if (not ((columna - 1) < 0)):
-            adyp2 = adyp2 or self._tablero[fila][columna-1] == c.P2
-            adyp1 = adyp1 or self._tablero[fila][columna-1] == c.P1
-        #Borde derecho del tablero
-        if (not ((columna + 1) >= c.CELDAS)):
-            adyp2 = adyp2 or self._tablero[fila][columna+1] == c.P2
-            adyp1 = adyp1 or self._tablero[fila][columna+1] == c.P1
-
-        if (self._jugadorActivo.getTurno() == c.P1 and adyp2):
-            adyacente = True
-        elif (self._jugadorActivo.getTurno() == c.P2 and adyp1):
-            adyacente = True
-
-        return adyacente
     
     def obtenerValorContario(self,turno):
         """Obtener el valor de turno del contrario"""
@@ -159,6 +109,35 @@ class MotorDeJuego ():
 
         return contrario
 
+    def posibleColocacion(self,fila,columna):
+        """Comprueba si la colocación es posible:
+            - True cuando se encierran fichas
+            - False en caso contrario
+        """
+
+        valorContrario = self.obtenerValorContario(self.getJugadorActivo().getTurno())
+        valorJugador = self.getJugadorActivo().getTurno()
+
+        # Arriba, Abajo, Izquierda, Derecha, DiagonalArribaIzquierda, DiagonalArribaDerecha, DiagonalAbajoIzquierda, DiagonalAbajoDerecha
+        direcciones = [(0, -1), (0, 1), (-1, 0), (1, 0),(-1, -1),(-1, 1),(-1, 1),(1, 1)]  
+        for dx, dy in direcciones:
+            celdas = []
+            x, y = fila, columna
+            while True:
+                x += dx
+                y += dy
+                if x < 0 or x >= c.CELDAS or y < 0 or y >= c.CELDAS:
+                    break
+                valor = self.obtenerValorCelda(x, y)
+                if valor == valorContrario:
+                    celdas.append([x, y])
+                elif valor == valorJugador:
+                    if len(celdas) > 0:
+                        return True
+                elif valor == 0:
+                    break
+
+        return False
 
     def fichasContrariasEncerradas(self,filaColocacion,columnaColocacion):
         """Determinar que celdas han sido encerradas tras la colocación y cambiar su valor"""
