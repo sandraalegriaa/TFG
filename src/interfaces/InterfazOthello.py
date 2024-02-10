@@ -8,7 +8,7 @@ import math as m
 from motores import IMotorDeJuego
 
 @dataclass
-class Interfaz ():
+class InterfazOthello ():
 
     _asset_tablero: pg.image
     _asset_blanca: pg.image
@@ -57,7 +57,8 @@ class Interfaz ():
     def cargarImagenes(self):
         """Cargar assets"""
 
-        asset_tablero = self.imagen(c.IMG_TABLERO,c.VENTANA_ANCHO)
+        asset_tablero = self.imagen(c.IMG_TABLERO,700)
+        #asset_tablero = self.imagen(c.IMG_TABLERO,c.VENTANA_ANCHO)
 
         asset_blanca = self.imagen(c.IMG_FICHA_BLANCA,c.DIM_FICHA)
         
@@ -130,6 +131,8 @@ class Interfaz ():
     def gestionEventos(self, motor: IMotorDeJuego):
         """Gestionar eventos en la interfaz"""
 
+        #TODO: cambiar de turno cuando no se pueda colocar según las reglas de colocación
+
         for event in pg.event.get():
             #Cerrar ventana
             if event.type == pg.QUIT:
@@ -165,8 +168,9 @@ class Interfaz ():
                             #Turno del siguiente jugador
                             motor.cambiarTurno(motor.getJugadorActivo())
 
-                            #BORRAR AL ACABAR
+                            #TODO: BORRAR AL ACABAR
                             print(motor.getTablero())
                             print(f"Columna: {columna}, fila: {fila}")
+
                          
 

@@ -3,20 +3,15 @@ from os.path import dirname
 sys.path.append(dirname(__file__))
 
 import Constantes as c
-from interfaces import Interfaz
-from motores import MotorDeJuego
-from jugadores import JugadorHumano
+from interfaces import MenuPrincipal
 
 class Aplicacion: 
 
     def __init__(self):
-        self._interfaz = Interfaz()        
-        self._jugador1 = JugadorHumano(c.NEGRO,c.P1)
-        self._jugador2 = JugadorHumano(c.BLANCO,c.P2)
-        self._juego = MotorDeJuego(self._jugador1, self._jugador2)
+        self._menuPrincipal = MenuPrincipal()
 
     def lanzaJuego(self):
-        self._juego.juega(self._interfaz)
+        self._menuPrincipal.iniciaMenu()
 
 def main():
     app = Aplicacion()

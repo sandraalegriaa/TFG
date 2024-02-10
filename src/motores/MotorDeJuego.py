@@ -6,7 +6,7 @@ import numpy as np
 import Constantes as c
 
 from interfaces import IInterfaz
-from jugadores import Jugador
+from jugadores import IJugador
 
 @dataclass
 class MotorDeJuego ():
@@ -28,17 +28,17 @@ class MotorDeJuego ():
 
         return self._tablero
     
-    def getJugadorActivo(self) -> Jugador:
+    def getJugadorActivo(self) -> IJugador:
         """Devuelve el jugador activo del motor de juego"""
 
         return self._jugadorActivo
     
-    def getJugador1(self) -> Jugador:
+    def getJugador1(self) -> IJugador:
         """Devuelve el jugador1 del motor de juego"""
 
         return self._jugador1
     
-    def getJugador2(self) -> Jugador:
+    def getJugador2(self) -> IJugador:
         """Devuelve el jugador2 del motor de juego"""
 
         return self._jugador2
@@ -48,7 +48,7 @@ class MotorDeJuego ():
 
         self._jugadorActivo = jugador
 
-    def _inicializarTablero (self, interfaz):
+    def _inicializarTablero (self, interfaz: IInterfaz):
         """Iniciliza el tablero de juego siguiendo las reglas estándar y actualiza la interfaz"""
 
         #Fichas blancas
@@ -81,7 +81,7 @@ class MotorDeJuego ():
 
         return fila in range(0,8) and columna in range(0,8)
     
-    def cambiarTurno(self, jugadorActual):
+    def cambiarTurno(self, jugadorActual: IJugador):
         """Cambiar el jugador activo dando el turno al siguiente jugador"""
 
         if jugadorActual.getTurno() == c.P1:

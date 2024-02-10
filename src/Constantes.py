@@ -3,8 +3,8 @@
 TITULO_INTERFAZ = "Othello"
 
 #Dimensiones
-VENTANA_LARGO = 700
-VENTANA_ANCHO = 700
+VENTANA_LARGO = 900 
+VENTANA_ANCHO = 900
 
 ORIGEN_TABLERO = {'x':117,'y':117}
 FIN_TABLERO = {'x':583,'y':583}
@@ -21,6 +21,7 @@ IMG_FICHA_NEGRA = "../Assets/Pieza-negra.png"
 #Colores RGB
 BLANCO_RGB = (255,255,255)
 NEGRO_RGB = (0,0,0)
+MARRON_RGB = (103,68,19)
 
 #Jugadores
 BLANCO = 2
