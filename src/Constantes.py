@@ -3,8 +3,8 @@
 TITULO_INTERFAZ = "Othello"
 
 #Dimensiones
-VENTANA_LARGO = 900 
-VENTANA_ANCHO = 900
+VENTANA_LARGO = 700 
+VENTANA_ANCHO = 700
 
 ORIGEN_TABLERO = {'x':117,'y':117}
 FIN_TABLERO = {'x':583,'y':583}
@@ -13,10 +13,23 @@ CELDAS = 8
 DIM_CELDA = DIM_TABLERO / CELDAS
 DIM_FICHA = DIM_CELDA
 
+#Fuentes
+FUENTE = "../Fuentes/KarmaSuture.ttf"
+
 #Imagenes
 IMG_TABLERO = "../Assets/Board-othello.png"
 IMG_FICHA_BLANCA = "../Assets/Pieza-blanca.png"
 IMG_FICHA_NEGRA = "../Assets/Pieza-negra.png"
+IMG_FONDO_MENU_PRINCIPAL = "../Assets/Fondo-Menu-Tablero.png"
+IMG_FONDO_JUEGO = "../Assets/Fondo-Menu.png"
+IMG_BOTON = "../Assets/Boton.png"
+IMG_BOTON_ENCIMA = "../Assets/Boton-Encima.png"
+
+#Botones
+ANCHURA_BOTON = 250
+ALTURA_BOTON = 100
+TEXTO_BOTON_IA = "1 VS IA"
+TEXTO_BOTON_JUGADORES = "1 VS 1"
 
 #Colores RGB
 BLANCO_RGB = (255,255,255)

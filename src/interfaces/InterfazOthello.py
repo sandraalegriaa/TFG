@@ -15,6 +15,7 @@ class InterfazOthello ():
     _asset_negra: pg.image
     _asset_blanca_trans: pg.image
     _asset_negra_trans: pg.image
+    _asset_fondo: pg.image
 
     def __init__(self):
 
@@ -25,7 +26,7 @@ class InterfazOthello ():
         self._ventana = self.configurarVentana()
 
         #Cargar assets de la interfaz
-        self._asset_tablero, self._asset_blanca, self._asset_negra, self._asset_blanca_trans, self._asset_negra_trans = self.cargarImagenes()
+        self._asset_fondo, self._asset_tablero, self._asset_blanca, self._asset_negra, self._asset_blanca_trans, self._asset_negra_trans = self.cargarImagenes()
 
     def configurarVentana(self):
         """Configurar la ventana de la aplicación"""
@@ -38,6 +39,9 @@ class InterfazOthello ():
 
     def inicializarInterfaz(self):
         """Inicializar interfaz según las reglas del juego"""
+
+        #Fondo
+        self._ventana.blit(self._asset_fondo, (0,0))
 
         #Tablero
         self._ventana.blit(self._asset_tablero, (0,0))
@@ -57,8 +61,9 @@ class InterfazOthello ():
     def cargarImagenes(self):
         """Cargar assets"""
 
+        asset_fondo = self.imagen(c.IMG_FONDO_JUEGO,c.VENTANA_ANCHO)
+
         asset_tablero = self.imagen(c.IMG_TABLERO,700)
-        #asset_tablero = self.imagen(c.IMG_TABLERO,c.VENTANA_ANCHO)
 
         asset_blanca = self.imagen(c.IMG_FICHA_BLANCA,c.DIM_FICHA)
         
@@ -68,7 +73,7 @@ class InterfazOthello ():
 
         asset_negra_trans = self.imagen(c.IMG_FICHA_NEGRA,c.DIM_FICHA)
 
-        return asset_tablero, asset_blanca, asset_negra, asset_blanca_trans, asset_negra_trans
+        return asset_fondo, asset_tablero, asset_blanca, asset_negra, asset_blanca_trans, asset_negra_trans
     
     def imagen(self,ruta,dim):
         """Obtener imagen de un asset"""
