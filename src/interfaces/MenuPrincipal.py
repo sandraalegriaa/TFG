@@ -20,15 +20,14 @@ class MenuPrincipal ():
     _jugador2: IJugador
 
     _assetFondoMenu: pg.image
-
-    _fuente: pg.font
-
-    """
     _assetBotonJugadorJugador: pg.image
     _assetBotonJugadorIA: pg.image
     _assetBotonJugadorJugadorEncima: pg.image
     _assetBotonJugadorIAEncima: pg.image
-    """ 
+
+    _fuenteBotones: pg.font
+    _fuenteTitulo: pg.font
+    
     def __init__(self):
 
         #Iniciar pygame
@@ -40,8 +39,11 @@ class MenuPrincipal ():
         #Cargar assets de la interfaz
         self._assetFondoMenu, self._assetBotonJugadorJugador, self._assetBotonJugadorJugadorEncima, self._assetBotonJugadorIA, self._assetBotonJugadorIAEncima = self.cargarImagenes()
 
-        #Cargar fuente
-        self._fuente = pg.font.Font(c.FUENTE, 30) 
+        #Cargar fuentes
+        self._fuenteBotones = pg.font.Font(c.FUENTE, 30) 
+        self._fuenteBotones.set_bold(True)
+        self._fuenteTitulo = pg.font.Font(c.FUENTE_TITULO, 85) 
+        self._fuenteTitulo.set_bold(True)
 
         #Definir botones 
         self._botonJugadorJugador = pg.Rect(((c.VENTANA_ANCHO // 2) - c.ANCHURA_BOTON // 2), ((c.VENTANA_LARGO // 2) - (c.ALTURA_BOTON//2)) - 70, c.ANCHURA_BOTON, c.ALTURA_BOTON)
@@ -71,15 +73,48 @@ class MenuPrincipal ():
     def inicializarInterfaz(self):
         """Inicializar menu principal"""
 
-        #Tablero
+        #Fondo
         self._ventana.blit(self._assetFondoMenu, (0,0))
+
+        #Título
+        self.dibujarTextoEspaciadoTitulo(c.TITULO,c.ESPACIADO_TITULO,c.MARRON_RGB)
 
         #Actualizar ventana
         pg.display.update()
     
+    def dibujarTextoEspaciadoTitulo(self,texto,espaciado,color):
+        """Dibujar en la interfaz el texto del título espaciado"""
+
+        dimensionTotal = sum([self._fuenteTitulo.size(letra)[0] + espaciado for letra in texto]) - espaciado
+        xInicial = (c.VENTANA_ANCHO - dimensionTotal) // 2
+        yInicial = c.VENTANA_LARGO // 2 - self._fuenteTitulo.size(texto)[1] // 1.5 - 200 
+
+        # Renderizar cada letra del texto individualmente con espaciado
+        for letra in texto:
+            assetLetra = self._fuenteTitulo.render(letra, True, color)
+            self._ventana.blit(assetLetra, (xInicial, yInicial))
+            # Ajustar xInicial para la siguiente letra
+            xInicial += assetLetra.get_width() + espaciado
+
+    def dibujarTextoEspaciadoBotones(self,texto,espaciado,color,xBoton, yBoton):
+        """Dibujar en la interfaz el texto de un botón espaciado"""
+
+        dimensionTotal = sum([self._fuenteBotones.size(letra)[0] + espaciado for letra in texto]) - espaciado
+        alturaTexto = self._fuenteBotones.size(texto)[1]
+        xInicial = xBoton + (c.ANCHURA_BOTON - dimensionTotal) // 2
+        yInicial = yBoton + (c.ALTURA_BOTON //2) - (alturaTexto//1.5)
+
+        # Renderizar cada letra del texto individualmente con espaciado
+        for letra in texto:
+            assetLetra = self._fuenteBotones.render(letra, True, color)
+            self._ventana.blit(assetLetra, (xInicial, yInicial))
+            # Ajustar xInicial para la siguiente letra
+            xInicial += assetLetra.get_width() + espaciado
+
+
     def imagen(self,ruta,dimX,dimY):
         """Obtener imagen de un asset"""
-    
+
         try:
             asset = pg.image.load(ruta)
             asset = pg.transform.scale(asset, (dimX,dimY))
@@ -95,28 +130,23 @@ class MenuPrincipal ():
     def cargarImagenes(self):
         """Cargar assets"""
 
-        asset_fondo = self.imagen(c.IMG_FONDO_MENU_PRINCIPAL,c.VENTANA_ANCHO,c.VENTANA_LARGO)
-
-        #TODO: Cambiar a assets correctos
+        assetFondo = self.imagen(c.IMG_FONDO_MENU_PRINCIPAL,c.VENTANA_ANCHO,c.VENTANA_LARGO)
         assetBotonJugadorJugador = self.imagen(c.IMG_BOTON,c.ANCHURA_BOTON,c.ALTURA_BOTON)
         assetBotonJugadorJugadorEncima = self.imagen(c.IMG_BOTON_ENCIMA,c.ANCHURA_BOTON,c.ALTURA_BOTON)
         assetBotonJugadorIA = self.imagen(c.IMG_BOTON,c.ANCHURA_BOTON,c.ALTURA_BOTON)
         assetBotonJugadorIAEncima = self.imagen(c.IMG_BOTON_ENCIMA,c.ANCHURA_BOTON,c.ALTURA_BOTON)
 
-        return asset_fondo, assetBotonJugadorJugador, assetBotonJugadorJugadorEncima, assetBotonJugadorIA, assetBotonJugadorIAEncima
+        return assetFondo, assetBotonJugadorJugador, assetBotonJugadorJugadorEncima, assetBotonJugadorIA, assetBotonJugadorIAEncima
     
     def dibujaBoton(self,boton: pg.rect,asset: pg.image, texto: str): 
         """Crea el boton en la interfaz"""  
+
         self._ventana.blit(asset, boton.topleft)
-        textoBoton = self._fuente.render(texto, True, (255, 255, 255))
-        dimensionesTexto = self._fuente.size(texto)
-        anchoTexto = dimensionesTexto[0]
-        alturaTexto = dimensionesTexto[1]
-        self._ventana.blit(textoBoton, (boton.x + c.ANCHURA_BOTON//2 - (anchoTexto//2), boton.y + c.ALTURA_BOTON//2-(alturaTexto//1.5)))
-        
+        self.dibujarTextoEspaciadoBotones(texto,c.ESPACIADO_BOTONES,c.MARRON_RGB,boton.x,boton.y)
 
     def gestionEventos(self):
         """Gestionar eventos en el menu principal"""
+
         for event in pg.event.get():
             #Cerrar ventana
             if event.type == pg.QUIT:

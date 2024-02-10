@@ -1,6 +1,7 @@
 #Archivo para declarar constantes de la aplicacion
 
 TITULO_INTERFAZ = "Othello"
+TITULO = "OTHELLO"
 
 #Dimensiones
 VENTANA_LARGO = 700 
@@ -15,6 +16,9 @@ DIM_FICHA = DIM_CELDA
 
 #Fuentes
 FUENTE = "../Fuentes/KarmaSuture.ttf"
+FUENTE_TITULO = "../Fuentes/KarmaSuture.ttf"
+ESPACIADO_TITULO = 2
+ESPACIADO_BOTONES = 1
 
 #Imagenes
 IMG_TABLERO = "../Assets/Board-othello.png"
@@ -34,7 +38,8 @@ TEXTO_BOTON_JUGADORES = "1 VS 1"
 #Colores RGB
 BLANCO_RGB = (255,255,255)
 NEGRO_RGB = (0,0,0)
-MARRON_RGB = (103,68,19)
+MARRON_RGB = (104,68,53)
+VERDE_RGB = (45,86,50)
 
 #Jugadores
 BLANCO = 2
