@@ -10,6 +10,7 @@ from motores import IMotorDeJuego
 @dataclass
 class InterfazOthello ():
 
+    #Assets
     _asset_tablero: pg.image
     _asset_blanca: pg.image
     _asset_negra: pg.image
@@ -18,8 +19,18 @@ class InterfazOthello ():
     _asset_fondo: pg.image
     _asset_blanca_turno: pg.image
     _asset_negra_turno: pg.image
+    _asset_blanca_movimiento: pg.image
+    _asset_negra_movimiento: pg.image
 
-    _fuente: pg.font
+    #Turnos
+    _fuenteTurno: pg.font
+    _fuenteMovimientos: pg.font
+
+    #Movimientos
+    _inicioTextoMovimientosY: int
+    _numeroMovimientos: int
+    _segundaColumnaEmpezada: bool
+    _terceraColumnaEmpezada: bool
 
     def __init__(self):
 
@@ -30,12 +41,18 @@ class InterfazOthello ():
         self._ventana = self.configurarVentana()
 
         #Cargar assets de la interfaz
-        self._asset_fondo, self._asset_tablero, self._asset_blanca, self._asset_negra, self._asset_blanca_trans, self._asset_negra_trans, self._asset_blanca_turno, self._asset_negra_turno = self.cargarImagenes()
+        self._asset_fondo, self._asset_tablero, self._asset_blanca, self._asset_negra, self._asset_blanca_trans, self._asset_negra_trans, self._asset_blanca_turno, self._asset_negra_turno, self._asset_blanca_movimiento, self._asset_negra_movimiento = self.cargarImagenes()
 
         #Cargar fuentes
-        self._fuente = pg.font.Font(c.FUENTE, 30) 
-        self._fuente.set_bold(True)
+        self._fuenteTurno = pg.font.Font(c.FUENTE, 30) 
+        self._fuenteTurno.set_bold(True)
+        self._fuenteMovimientos = pg.font.Font(c.FUENTE, 22) 
+        self._fuenteMovimientos.set_bold(True)
 
+        self._inicioTextoMovimientosY = c.INICIO_TEXTO_MOVIMIENTOS['y']
+        self._numeroMovimientos = 0
+        self._segundaColumnaEmpezada = False
+        self._terceraColumnaEmpezada = False
 
     def configurarVentana(self):
         """Configurar la ventana de la aplicación"""
@@ -76,22 +93,21 @@ class InterfazOthello ():
         """Cargar assets"""
 
         asset_fondo = self.imagen(c.IMG_FONDO_JUEGO,c.VENTANA_ANCHO)
-
         asset_tablero = self.imagen(c.IMG_TABLERO,700)
 
         asset_blanca = self.imagen(c.IMG_FICHA_BLANCA,c.DIM_FICHA)
-        
         asset_negra = self.imagen(c.IMG_FICHA_NEGRA, c.DIM_FICHA)
 
         asset_blanca_trans = self.imagen(c.IMG_FICHA_BLANCA,c.DIM_FICHA)
-
         asset_negra_trans = self.imagen(c.IMG_FICHA_NEGRA,c.DIM_FICHA)
 
         _asset_blanca_turno = self.imagen(c.IMG_FICHA_BLANCA,c.DIM_FICHA_TURNO)
-
         _asset_negra_turno = self.imagen(c.IMG_FICHA_NEGRA, c.DIM_FICHA_TURNO)
 
-        return asset_fondo, asset_tablero, asset_blanca, asset_negra, asset_blanca_trans, asset_negra_trans, _asset_blanca_turno, _asset_negra_turno
+        _asset_blanca_movimiento = self.imagen(c.IMG_FICHA_BLANCA, c.DIM_FICHA_MOVIMIENTO)
+        _asset_negra_movimiento = self.imagen(c.IMG_FICHA_NEGRA, c.DIM_FICHA_MOVIMIENTO)
+
+        return asset_fondo, asset_tablero, asset_blanca, asset_negra, asset_blanca_trans, asset_negra_trans, _asset_blanca_turno, _asset_negra_turno, _asset_blanca_movimiento, _asset_negra_movimiento
     
     def imagen(self,ruta,dim):
         """Obtener imagen de un asset"""
@@ -153,13 +169,27 @@ class InterfazOthello ():
     def dibujarTextoEspaciadoTurno(self,texto,espaciado,color):
         """Dibujar en la interfaz el texto del título espaciado"""
 
-        dimensionTotal = sum([self._fuente.size(letra)[0] + espaciado for letra in texto]) - espaciado
+        dimensionTotal = sum([self._fuenteTurno.size(letra)[0] + espaciado for letra in texto]) - espaciado
         xInicial = c.LOCALIZACION_CENTRO_DERECHA - dimensionTotal
         yInicial = c.ORIGEN_MARGO['y']
 
         # Renderizar cada letra del texto individualmente con espaciado
         for letra in texto:
-            assetLetra = self._fuente.render(letra, True, color)
+            assetLetra = self._fuenteTurno.render(letra, True, color)
+            self._ventana.blit(assetLetra, (xInicial, yInicial))
+            # Ajustar xInicial para la siguiente letra
+            xInicial += assetLetra.get_width() + espaciado
+
+    def dibujarTextoEspaciadoMovimientos(self,texto,espaciado,color,offset):
+        """Dibujar en la interfaz el texto del título espaciado"""
+
+        dimensionTotal = sum([self._fuenteMovimientos.size(letra)[0] + espaciado for letra in texto]) - espaciado
+        xInicial = c.LOCALIZACION_CENTRO_DERECHA - dimensionTotal + offset
+        yInicial = self._inicioTextoMovimientosY
+
+        # Renderizar cada letra del texto individualmente con espaciado
+        for letra in texto:
+            assetLetra = self._fuenteMovimientos.render(letra, True, color)
             self._ventana.blit(assetLetra, (xInicial, yInicial))
             # Ajustar xInicial para la siguiente letra
             xInicial += assetLetra.get_width() + espaciado
@@ -174,6 +204,52 @@ class InterfazOthello ():
 
         #Colocar la ficha 
         self._ventana.blit(assetTurno, (c.LOCALIZACION_CENTRO_DERECHA+20,c.ORIGEN_MARGO['y']))
+        #Actualizar ventana
+        pg.display.update()
+
+    
+    def actualizarInicioTextoMovimientosY(self):
+        self._inicioTextoMovimientosY += c.DISTANCIA_TEXTO_MOVIMIENTOS
+
+    def reiniciarInicioTextoMovimientosY(self):
+        self._inicioTextoMovimientosY = c.INICIO_TEXTO_MOVIMIENTOS['y']
+
+    def indicarMovimiento(self,jugador:int,fila:int,columna:int):
+        """Indicar visualmente el movimiento realizado por el jugador activo"""
+
+        #Comprobar en qué columna escribir el movimiento
+        if (self._numeroMovimientos < c.MAXIMO_MOVIMIENTOS_TEXTO):
+            offset = c.OFFSET_UNO_MOVIMIENTO
+        elif (self._numeroMovimientos < c.MAXIMO_MOVIMIENTOS_TEXTO*2):
+            offset = c.OFFSET_DOS_MOVIMIENTO
+            if (not self._segundaColumnaEmpezada):
+                self.reiniciarInicioTextoMovimientosY()
+                self._segundaColumnaEmpezada = True
+        else:
+            offset = c.OFFSET_DOS_MOVIMIENTO = c.OFFSET_TRES_MOVIMIENTO
+            if (not self._terceraColumnaEmpezada):
+                self.reiniciarInicioTextoMovimientosY()
+                self._terceraColumnaEmpezada = True
+
+        #Mostrar cual es el jugador que ha realizado el movimiento
+        if jugador == c.P1:
+            assetTurno = self._asset_negra_movimiento
+        else: 
+            assetTurno = self._asset_blanca_movimiento
+
+        #Colocar la ficha 
+        self._ventana.blit(assetTurno, (c.LOCALIZACION_CENTRO_DERECHA-75+offset,self._inicioTextoMovimientosY))
+        
+        #Mostrar el movimiento realizado
+        columna = c.VALOR_COLUMNAS[str(columna)]
+        fila = str(fila)
+        texto = fila + columna
+        self.dibujarTextoEspaciadoMovimientos(texto,c.ESPACIADO_MOVIMIENTOS,c.MARRON_RGB,offset)
+
+        #Incrementar valores necesarios
+        self._numeroMovimientos += 1
+        self.actualizarInicioTextoMovimientosY()
+
         #Actualizar ventana
         pg.display.update()
 
@@ -209,8 +285,12 @@ class InterfazOthello ():
 
                             #Colocar ficha del jugador
                             ficha = self.obtenerFichaJugador(motor)
-                            self.colocarFicha(ficha,fila,columna)       
+                            self.colocarFicha(ficha,fila,columna)  
 
+                            #Indicar movimiento realizado     
+                            self.indicarMovimiento(motor.getJugadorActivo().getTurno(),fila,columna)
+
+                            #Capturar fichas enemigas
                             motor.cambiarValorFichasEncerradas(celdas)
                             self.cambiarFichasEncerradas(motor, celdas)
 
