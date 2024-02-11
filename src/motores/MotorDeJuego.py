@@ -117,9 +117,8 @@ class MotorDeJuego ():
 
         self._inicializarTablero(interfaz)
 
-        fin  = False
-        while(not fin):
-            fin = interfaz.gestionEventos(self)
+        while(True):
+            interfaz.gestionEventos(self)
     
     def obtenerValorContario(self,turno:int):
         """Obtener el valor de turno del contrario"""

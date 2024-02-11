@@ -4,6 +4,9 @@ import Constantes as c
 import pygame as pg
 import sys
 import math as m
+import tkinter as tk
+from tkinter import filedialog
+import os
 
 from motores import IMotorDeJuego
 
@@ -21,16 +24,26 @@ class InterfazOthello ():
     _asset_negra_turno: pg.image
     _asset_blanca_movimiento: pg.image
     _asset_negra_movimiento: pg.image
+    _asset_tapar_texto: pg.image
 
-    #Turnos
+    #Botones
+    _assetBoton: pg.image
+    _assetBotonEncima: pg.image
+
+    _botonGuardar: pg.Rect
+
+    #Fuentes
     _fuenteTurno: pg.font
     _fuenteMovimientos: pg.font
+    _fuenteBotones: pg.font
 
     #Movimientos
     _inicioTextoMovimientosY: int
     _numeroMovimientos: int
     _segundaColumnaEmpezada: bool
     _terceraColumnaEmpezada: bool
+
+    _fin: bool
 
     def __init__(self):
 
@@ -41,18 +54,23 @@ class InterfazOthello ():
         self._ventana = self.configurarVentana()
 
         #Cargar assets de la interfaz
-        self._asset_fondo, self._asset_tablero, self._asset_blanca, self._asset_negra, self._asset_blanca_trans, self._asset_negra_trans, self._asset_blanca_turno, self._asset_negra_turno, self._asset_blanca_movimiento, self._asset_negra_movimiento = self.cargarImagenes()
+        self._asset_fondo, self._asset_tablero, self._asset_blanca, self._asset_negra, self._asset_blanca_trans, self._asset_negra_trans, self._asset_blanca_turno, self._asset_negra_turno, self._asset_blanca_movimiento, self._asset_negra_movimiento, self._asset_tapar_texto, self._assetBoton, self._assetBotonEncima = self.cargarImagenes()
 
         #Cargar fuentes
         self._fuenteTurno = pg.font.Font(c.FUENTE, 30) 
         self._fuenteTurno.set_bold(True)
         self._fuenteMovimientos = pg.font.Font(c.FUENTE, 22) 
         self._fuenteMovimientos.set_bold(True)
+        self._fuenteBotones = pg.font.Font(c.FUENTE, 22) 
+        self._fuenteBotones.set_bold(True)
 
+        #Movimientos
         self._inicioTextoMovimientosY = c.INICIO_TEXTO_MOVIMIENTOS['y']
         self._numeroMovimientos = 0
         self._segundaColumnaEmpezada = False
         self._terceraColumnaEmpezada = False
+
+        self._fin = False
 
     def configurarVentana(self):
         """Configurar la ventana de la aplicación"""
@@ -107,7 +125,12 @@ class InterfazOthello ():
         _asset_blanca_movimiento = self.imagen(c.IMG_FICHA_BLANCA, c.DIM_FICHA_MOVIMIENTO)
         _asset_negra_movimiento = self.imagen(c.IMG_FICHA_NEGRA, c.DIM_FICHA_MOVIMIENTO)
 
-        return asset_fondo, asset_tablero, asset_blanca, asset_negra, asset_blanca_trans, asset_negra_trans, _asset_blanca_turno, _asset_negra_turno, _asset_blanca_movimiento, _asset_negra_movimiento
+        _asset_tapar_texto = self.imagenDimesiones(c.IMG_TAPA_TEXTO, c.DIM_TAPA_TEXTO['x'], c.DIM_TAPA_TEXTO['y'])
+
+        _asset_boton = self.imagenDimesiones(c.IMG_BOTON,c.ANCHURA_BOTON_GUARDADO,c.ALTURA_BOTON_GUARDADO)
+        _asset_boton_encima = self.imagenDimesiones(c.IMG_BOTON_ENCIMA,c.ANCHURA_BOTON_GUARDADO,c.ALTURA_BOTON_GUARDADO)
+
+        return asset_fondo, asset_tablero, asset_blanca, asset_negra, asset_blanca_trans, asset_negra_trans, _asset_blanca_turno, _asset_negra_turno, _asset_blanca_movimiento, _asset_negra_movimiento, _asset_tapar_texto, _asset_boton, _asset_boton_encima
     
     def imagen(self,ruta,dim):
         """Obtener imagen de un asset"""
@@ -115,6 +138,21 @@ class InterfazOthello ():
         try:
             asset = pg.image.load(ruta)
             asset = pg.transform.scale(asset, (dim,dim))
+        except FileNotFoundError as enf:
+            print(f"No se pudo encontrar la imagen {ruta}")
+            raise SystemExit(enf)
+        except pg.error as er:
+            print(f"No se pudo abrir la imagen {ruta}")
+            raise SystemExit(er)
+        
+        return asset
+    
+    def imagenDimesiones(self,ruta,dimX,dimY):
+        """Obtener imagen de un asset"""
+    
+        try:
+            asset = pg.image.load(ruta)
+            asset = pg.transform.scale(asset, (dimX,dimY))
         except FileNotFoundError as enf:
             print(f"No se pudo encontrar la imagen {ruta}")
             raise SystemExit(enf)
@@ -167,7 +205,7 @@ class InterfazOthello ():
             self.colocarFicha(ficha,fila,columna)
 
     def dibujarTextoEspaciadoTurno(self,texto,espaciado,color):
-        """Dibujar en la interfaz el texto del título espaciado"""
+        """Dibujar en la interfaz el texto indicador del turno espaciado"""
 
         dimensionTotal = sum([self._fuenteTurno.size(letra)[0] + espaciado for letra in texto]) - espaciado
         xInicial = c.LOCALIZACION_CENTRO_DERECHA - dimensionTotal
@@ -180,8 +218,22 @@ class InterfazOthello ():
             # Ajustar xInicial para la siguiente letra
             xInicial += assetLetra.get_width() + espaciado
 
+    def dibujarTextoEspaciadoGanador(self,texto,espaciado,color):
+        """Dibujar en la interfaz el texto del ganador espaciado"""
+
+        dimensionTotal = sum([self._fuenteTurno.size(letra)[0] + espaciado for letra in texto]) - espaciado
+        xInicial = c.LOCALIZACION_CENTRO_DERECHA - dimensionTotal + 120
+        yInicial = c.ORIGEN_MARGO['y']
+
+        # Renderizar cada letra del texto individualmente con espaciado
+        for letra in texto:
+            assetLetra = self._fuenteTurno.render(letra, True, color)
+            self._ventana.blit(assetLetra, (xInicial, yInicial))
+            # Ajustar xInicial para la siguiente letra
+            xInicial += assetLetra.get_width() + espaciado
+
     def dibujarTextoEspaciadoMovimientos(self,texto,espaciado,color,offset):
-        """Dibujar en la interfaz el texto del título espaciado"""
+        """Dibujar en la interfaz el texto de cada movimiento espaciado"""
 
         dimensionTotal = sum([self._fuenteMovimientos.size(letra)[0] + espaciado for letra in texto]) - espaciado
         xInicial = c.LOCALIZACION_CENTRO_DERECHA - dimensionTotal + offset
@@ -190,6 +242,21 @@ class InterfazOthello ():
         # Renderizar cada letra del texto individualmente con espaciado
         for letra in texto:
             assetLetra = self._fuenteMovimientos.render(letra, True, color)
+            self._ventana.blit(assetLetra, (xInicial, yInicial))
+            # Ajustar xInicial para la siguiente letra
+            xInicial += assetLetra.get_width() + espaciado
+
+    def dibujarTextoEspaciadoBotones(self,texto,espaciado,color,xBoton, yBoton):
+        """Dibujar en la interfaz el texto de un botón espaciado"""
+
+        dimensionTotal = sum([self._fuenteBotones.size(letra)[0] + espaciado for letra in texto]) - espaciado
+        alturaTexto = self._fuenteBotones.size(texto)[1]
+        xInicial = xBoton + (c.ANCHURA_BOTON_GUARDADO - dimensionTotal) // 2
+        yInicial = yBoton + (c.ALTURA_BOTON_GUARDADO //2) - (alturaTexto//1.5)
+
+        # Renderizar cada letra del texto individualmente con espaciado
+        for letra in texto:
+            assetLetra = self._fuenteBotones.render(letra, True, color)
             self._ventana.blit(assetLetra, (xInicial, yInicial))
             # Ajustar xInicial para la siguiente letra
             xInicial += assetLetra.get_width() + espaciado
@@ -253,87 +320,152 @@ class InterfazOthello ():
         #Actualizar ventana
         pg.display.update()
 
-    def gestionEventos(self, motor: IMotorDeJuego):
-        """Gestionar eventos en la interfaz"""
-        fin = False
+    def dibujaBoton(self,boton: pg.rect,asset: pg.image, texto: str): 
+        """Crea el boton en la interfaz"""  
 
-        if (not motor.comprobarPosiblesMovimientos()):
-            print("NO PUEDE COLOCAR, CAMBIAR TURNO AL SIGUIENTE")
+        self._ventana.blit(asset, boton.topleft)
+        self.dibujarTextoEspaciadoBotones(texto,c.ESPACIADO_BOTONES,c.MARRON_RGB,boton.x,boton.y)
 
-            #Cambiar el turno al siguiente jugador
-            motor.cambiarTurno(motor.getJugadorActivo())
-            self.indicarCambioDeTurno(motor.getJugadorActivo().getTurno())
+    def finPartida(self,motor:IMotorDeJuego):
 
-        if (motor.comprobarFinJuego()):
-            #TODO: TERMINAR LA PARTIDA CON INTERFAZ PERSONALIZADA
-            ganador = motor.comprobarGanador()
-            fin = True
+        self._fin = True
 
-            if (ganador == c.EMPATE_ENTRE_JUGADORES):
-                #Empate entre jugadores
-                pg.image.save(self._ventana, "../Assets/empate.png")
-                print("EMPATE")
-                pg.quit()
-                return fin
-            elif (ganador == c.JUGADOR1_GANA):
-                #Ganan las negras
-                print("GANAN LAS NEGRAS")
-                pg.image.save(self._ventana, "../Assets/negras.png")
-                pg.quit()
-                return fin
-            else:
-                #Ganan las blancas
-                print("GANAN LAS BLANCAS")
-                pg.image.save(self._ventana, "../Assets/blancas.png")
-                pg.quit()
-                return fin
+        ganador = motor.comprobarGanador()
+        
+        if (ganador == c.EMPATE_ENTRE_JUGADORES):
+            #Empate entre jugadores
+            nombre = "EMPATE"
+            textoGanador = c.EMPATE
+            color = c.VERDE_RGB
+        elif (ganador == c.JUGADOR1_GANA):
+            #Ganan las negras
+            nombre = "NEGRAS"
+            textoGanador = c.NEGRAS
+            color = c.NEGRO_RGB
+        else:
+            #Ganan las blancas
+            nombre = "BLANCAS"
+            textoGanador = c.BLANCAS
+            color = c.BLANCO_RGB
+
+        #Tapar texto turno
+        self._ventana.blit(self._asset_tapar_texto, (c.LOCALIZACION_CENTRO_DERECHA-100,c.ORIGEN_MARGO['y']))
+
+        #Escribir texto del ganador
+        self.dibujarTextoEspaciadoGanador(textoGanador,c.ESPACIADO_GANADOR,color)
+
+        #Generar botón de guardado
+        self._botonGuardar = pg.Rect(c.LOCALIZACION_CENTRO_DERECHA-120,c.FIN_TABLERO['y']+10, c.ANCHURA_BOTON_GUARDADO, c.ALTURA_BOTON_GUARDADO)
+        self.dibujaBoton(self._botonGuardar,self._assetBoton, c.TEXTO_BOTON_GUARDADO)
+
+        #Escribir indicador del botón 
+        self.dibujarTextoEspaciadoBotones(c.TEXTO_BOTON_GUARDADO,c.ESPACIADO_BOTONES,c.MARRON_RGB,self._botonGuardar.x,self._botonGuardar.y)
+
+        #Actualizar ventana
+        pg.display.update()  
+
+        rutaProvisional = "../Imagenes/" + nombre + ".png"
+        pg.image.save(self._ventana, rutaProvisional)   
+
+        print(textoGanador)
+
+        #Gestionar eventos del botón 
+        while (True):
+            self.gestionaEventosFinalDePartida(rutaProvisional)
+
+    def gestionaEventosFinalDePartida(self,rutaProvisional:str):
 
         for event in pg.event.get():
             #Cerrar ventana
             if event.type == pg.QUIT:
                 pg.quit()
                 sys.exit()
-            #Click del raton
-            elif event.type == pg.MOUSEBUTTONDOWN:
-                #Coordenadas del click
-                pos = pg.mouse.get_pos()
-                if (pos != None):
-                    #Obtener celda
-                    fila, columna = self.obtenerCelda(pos)
-                    print(pos)
-                    print()
-                    #Colocacion de las fichas
-                    if (motor.dentroCeldas(fila,columna) and motor.obtenerValorCelda(fila,columna) == 0):
-                        
-                        #Comprobar si hay fichas que han quedado encerradas
-                        celdas = motor.fichasContrariasEncerradas(fila,columna)
+            if event.type == pg.MOUSEBUTTONDOWN:
+                if self._botonGuardar.collidepoint(event.pos):
+                    #Guardar estado del juego
+                    ventanaInvisible = tk.Tk()
+                    ventanaInvisible.withdraw()
 
-                        if (len(celdas) > 0):
+                    ruta = filedialog.asksaveasfilename(defaultextension=".png",
+                        filetypes=[("PNG files", "*.png"), ("All files", "*.*")],
+                        initialdir=os.getcwd(),  # Directorio inicial: directorio de trabajo actual
+                        title="Guardar como"
+                        )
+                    if ruta:
+                        # Mueve el archivo de la ubicación temporal a la carpeta seleccionada
+                        os.rename(rutaProvisional, ruta)
+                        print(f"Captura guardada en: {ruta}")
+                    else:
+                        print("No se seleccionó ninguna carpeta.") 
 
-                            #Indicar que jugador coloca la ficha en el tablero
-                            motor.modificarValorCelda(fila,columna,motor.getJugadorActivo().getTurno())
-                            motor.aumentaCantidadFichasJugador(motor.getJugadorActivo())
+    def gestionEventos(self, motor: IMotorDeJuego):
+        """Gestionar eventos en la interfaz"""
 
-                            #Colocar ficha del jugador en la interfaz
-                            ficha = self.obtenerFichaJugador(motor)
-                            self.colocarFicha(ficha,fila,columna)  
+        if (self._fin):
+            """Esperar a que el usuario cierre la ventana"""
+            for event in pg.event.get():
+                #Cerrar ventana
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    sys.exit()
 
-                            #Indicar movimiento realizado     
-                            self.indicarMovimiento(motor.getJugadorActivo().getTurno(),fila,columna)
+        if (not self._fin):
+            """El juego sigue en marcha"""
+            if (not motor.comprobarPosiblesMovimientos()):
+                print("NO PUEDE COLOCAR, CAMBIAR TURNO AL SIGUIENTE")
 
-                            #Capturar fichas enemigas
-                            motor.cambiarValorFichasEncerradas(celdas)
-                            self.cambiarFichasEncerradas(motor, celdas)
-                            motor.modificarCantidadFichasJugador(motor.getJugadorActivo(), len(celdas))
+                #Cambiar el turno al siguiente jugador
+                motor.cambiarTurno(motor.getJugadorActivo())
+                self.indicarCambioDeTurno(motor.getJugadorActivo().getTurno())
 
-                            #Turno del siguiente jugador
-                            motor.cambiarTurno(motor.getJugadorActivo())
-                            self.indicarCambioDeTurno(motor.getJugadorActivo().getTurno())
+            if (motor.comprobarFinJuego()):
+                self.finPartida(motor)
 
-                            print(motor.getTablero())
-                            print(f"Columna: {columna}, fila: {fila}")
+            for event in pg.event.get():
+                #Cerrar ventana
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    sys.exit()
+                #Click del raton
+                elif event.type == pg.MOUSEBUTTONDOWN:
+                    #Coordenadas del click
+                    pos = pg.mouse.get_pos()
+                    if (pos != None):
+                        #Obtener celda
+                        fila, columna = self.obtenerCelda(pos)
+                        print(pos)
+                        print()
+                        #Colocacion de las fichas
+                        if (motor.dentroCeldas(fila,columna) and motor.obtenerValorCelda(fila,columna) == 0):
+                            
+                            #Comprobar si hay fichas que han quedado encerradas
+                            celdas = motor.fichasContrariasEncerradas(fila,columna)
 
-        return fin
+                            if (len(celdas) > 0):
+
+                                #Indicar que jugador coloca la ficha en el tablero
+                                motor.modificarValorCelda(fila,columna,motor.getJugadorActivo().getTurno())
+                                motor.aumentaCantidadFichasJugador(motor.getJugadorActivo())
+
+                                #Colocar ficha del jugador en la interfaz
+                                ficha = self.obtenerFichaJugador(motor)
+                                self.colocarFicha(ficha,fila,columna)  
+
+                                #Indicar movimiento realizado     
+                                self.indicarMovimiento(motor.getJugadorActivo().getTurno(),fila,columna)
+
+                                #Capturar fichas enemigas
+                                motor.cambiarValorFichasEncerradas(celdas)
+                                self.cambiarFichasEncerradas(motor, celdas)
+                                motor.modificarCantidadFichasJugador(motor.getJugadorActivo(), len(celdas))
+
+                                #Turno del siguiente jugador
+                                motor.cambiarTurno(motor.getJugadorActivo())
+                                self.indicarCambioDeTurno(motor.getJugadorActivo().getTurno())
+
+                                print(motor.getTablero())
+                                print(f"Columna: {columna}, fila: {fila}")
+
 
                          
 
