@@ -10,12 +10,33 @@ from jugadores import IJugador
 
 @dataclass
 class MotorDeJuego ():
+
     _tablero = np.zeros((8, 8))
+
+    _jugador1: IJugador
+    _jugador2: IJugador
+
+    _fichasNegras: int
+    _fichasBlancas: int
+
+    _posibleMovimientoJ1: bool
+    _posibleMovimientoJ2: bool
 
     def __init__(self, jugador1, jugador2):
 
         self._jugador1 = jugador1
         self._jugador2 = jugador2
+
+        #Ambos jugadores pueden comenzar realizando movimientos 
+        self._posibleMovimientoJ1 = True
+        self._posibleMovimientoJ2 = True
+
+        #El tablero comienza con huecos disponibles
+        self._tableroCompletado = False
+
+        #Inicializar la cantidad de fichas de cada jugador según las reglas de inicialización del tablero
+        self._fichasNegras = 2
+        self._fichasBlancas = 2
 
         #Realiza el primer movimiento el que maneje a las fichas negras
         if self._jugador1.getColor() == c.NEGRO:
@@ -43,7 +64,7 @@ class MotorDeJuego ():
 
         return self._jugador2
     
-    def setJugadorActivo(self,jugador):
+    def setJugadorActivo(self,jugador: IJugador):
         """Cambiar el jugador activo en el motor de juego"""
 
         self._jugadorActivo = jugador
@@ -62,7 +83,7 @@ class MotorDeJuego ():
         #Actualizar interfaz
         interfaz.inicializarInterfaz()
 
-    def obtenerValorCelda(self, fila, columna):
+    def obtenerValorCelda(self, fila:int, columna:int):
         """Obtener el valor de una celda en el tablero"""
         
         if (self.dentroCeldas(fila,columna)):
@@ -70,13 +91,13 @@ class MotorDeJuego ():
         
         return None
     
-    def modificarValorCelda(self,fila,columna,valor):
+    def modificarValorCelda(self,fila:int,columna:int,valor:int):
         """Modificar el valor de una celda en el tablero"""
         
         self._tablero[fila][columna] = valor
 
     
-    def dentroCeldas(self,fila,columna):
+    def dentroCeldas(self,fila:int,columna:int):
         """Comprueba si una celda se encuentra en el tablero"""
 
         return fila in range(0,8) and columna in range(0,8)
@@ -96,10 +117,11 @@ class MotorDeJuego ():
 
         self._inicializarTablero(interfaz)
 
-        while(True):
-            interfaz.gestionEventos(self)
+        fin  = False
+        while(not fin):
+            fin = interfaz.gestionEventos(self)
     
-    def obtenerValorContario(self,turno):
+    def obtenerValorContario(self,turno:int):
         """Obtener el valor de turno del contrario"""
         
         if turno == c.P1:
@@ -109,7 +131,28 @@ class MotorDeJuego ():
 
         return contrario
 
-    def fichasContrariasEncerradas(self,filaColocacion,columnaColocacion):
+    def aumentaCantidadFichasJugador(self,jugadorActivo:IJugador):
+        """Incrementa en 1 la cantidad de fichas de un jugador al colocar una ficha"""
+
+        if jugadorActivo.getTurno() == c.P1:
+            self._fichasNegras += 1
+        else: 
+            self._fichasBlancas += 1
+
+    def modificarCantidadFichasJugador(self, jugadorActivo: IJugador, cantidadFichas: int):
+        """Modifica la cantidad de fichas de un jugador al encerrar fichas de su oponente"""
+
+        if jugadorActivo.getTurno() == c.P1:
+            self._fichasNegras += cantidadFichas
+            self._fichasBlancas -= cantidadFichas
+        else: 
+            self._fichasBlancas += cantidadFichas
+            self._fichasNegras -= cantidadFichas
+        
+        #TODO: BORRAR
+        print(self._fichasNegras,self._fichasBlancas)
+
+    def fichasContrariasEncerradas(self,filaColocacion:int,columnaColocacion:int):
         """Determinar que celdas han sido encerradas tras la colocación y cambiar su valor"""
         celdasEncerradas = []
         celdas = []
@@ -144,3 +187,52 @@ class MotorDeJuego ():
             fila, columna = celda[0], celda[1]
             valor = self.obtenerValorCelda(fila,columna)
             self.modificarValorCelda(fila,columna,self.obtenerValorContario(valor))
+
+    def comprobarFinJuego(self):
+        """Comprobar si el juego se ha acabado porque:
+          - No quedan casillas libres en el tablero. 
+          - Porque ningún jugador puede realizar movimientos."""
+        
+        fin = False
+
+        if(self._fichasNegras+self._fichasBlancas >= c.CASILLAS_TABLERO):
+            fin = True
+        elif(not self._posibleMovimientoJ1 and not self._posibleMovimientoJ2):
+            fin = True
+
+        return fin 
+    
+    def comprobarGanador(self):
+        """Comprobar qué jugador es el ganador o si ha habido empate"""
+        
+        ganador = None
+
+        if (self._fichasNegras == self._fichasBlancas):
+            ganador = c.EMPATE_ENTRE_JUGADORES
+        elif (self._fichasNegras > self._fichasBlancas):
+            ganador = c.JUGADOR1_GANA
+        else:
+            ganador = c.JUGADOR2_GANA
+
+        return ganador
+    
+    def comprobarPosiblesMovimientos(self):
+        """Recorrer el tablero buscando si hay posibles movimientos para el jugador indicado"""
+        posible = False
+
+        #Recorrer tablero comprobando cada celda
+        for fila in range(c.CELDAS):
+            for columna in range(c.CELDAS):
+                if (self.obtenerValorCelda(fila,columna) == 0):
+                    encerradas = self.fichasContrariasEncerradas(fila,columna)
+                    if (len(encerradas) > 0):
+                        posible = True
+                        break
+
+        #Almacenar información
+        if self._jugadorActivo.getTurno() == c.P1:
+            self._posibleMovimientoJ1 = posible
+        else: 
+            self._posibleMovimientoJ2 = posible
+        
+        return posible

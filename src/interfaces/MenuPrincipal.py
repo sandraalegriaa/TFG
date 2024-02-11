@@ -27,11 +27,15 @@ class MenuPrincipal ():
 
     _fuenteBotones: pg.font
     _fuenteTitulo: pg.font
+
+    _cerrarVentana: bool
     
     def __init__(self):
 
         #Iniciar pygame
         pg.init()
+
+        self._cerrarVentana = False
 
         #Configurar ventana de juego
         self._ventana = self.configurarVentana()
@@ -147,64 +151,69 @@ class MenuPrincipal ():
     def gestionEventos(self):
         """Gestionar eventos en el menu principal"""
 
-        for event in pg.event.get():
-            #Cerrar ventana
-            if event.type == pg.QUIT:
-                pg.quit()
-                sys.exit()
-            if event.type == pg.MOUSEBUTTONDOWN:
-                if self._botonJugadorJugador.collidepoint(event.pos):
-                    #Crear dos jugadores humanos
-                    self._jugador1 = JugadorHumano(c.NEGRO,c.P1)
-                    self._jugador2 = JugadorHumano(c.BLANCO,c.P2)
-                    self._juego = MotorDeJuego(self._jugador1, self._jugador2)
-                    self._interfazOthello = InterfazOthello()
-                    self._juego.juega(self._interfazOthello)
-                    print("Botón Jugador vs Jugador presionado")
+        if (not self._cerrarVentana):
+            for event in pg.event.get():
+                #Cerrar ventana
+                if event.type == pg.QUIT:
                     pg.quit()
-                elif self._botonJugadorIA.collidepoint(event.pos):
-                    print("Botón 2 presionado")
+                    sys.exit()
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    if self._botonJugadorJugador.collidepoint(event.pos):
+                        #Crear dos jugadores humanos
+                        self._jugador1 = JugadorHumano(c.NEGRO,c.P1)
+                        self._jugador2 = JugadorHumano(c.BLANCO,c.P2)
+                        self._juego = MotorDeJuego(self._jugador1, self._jugador2)
+                        self._interfazOthello = InterfazOthello()
+                        self._juego.juega(self._interfazOthello)
+                        print("Botón Jugador vs Jugador presionado")
+                        self._cerrarVentana = True
+                    elif self._botonJugadorIA.collidepoint(event.pos):
+                        print("Botón 2 presionado")
+                        self._cerrarVentana = True
+
+        if (not self._cerrarVentana):
+            #Detectar ratón sobre botones           
+            posicion = pg.mouse.get_pos()
+
+            antiguoAsset = self._assetBotonJugadores
+            #Boton jugador vs jugador
+            if self._botonJugadorJugador.collidepoint(posicion):
+                self._assetBotonJugadores = self._assetBotonJugadorJugadorEncima
+            else: 
+                self._assetBotonJugadores = self._assetBotonJugadorJugador
+
+            #Comprobar si la situación ha cambiado 
+            if self._assetBotonJugadores != antiguoAsset:
+                redibujarBotonJugadores = True
+            else: 
+                redibujarBotonJugadores = False
+
+            #Boton jugador vs IA
+            antiguoAsset = self._assetBotonIA
+
+            if self._botonJugadorIA.collidepoint(posicion):
+                self._assetBotonIA = self._assetBotonJugadorIAEncima
+            else: 
+                self._assetBotonIA = self._assetBotonJugadorIA
+
+            #Comprobar si la situación ha cambiado 
+            if self._assetBotonIA != antiguoAsset:
+                redibujarBotonIA = True
+            else: 
+                redibujarBotonIA = False
+
+            if redibujarBotonJugadores:
+                self.dibujaBoton(self._botonJugadorJugador,self._assetBotonJugadores, c.TEXTO_BOTON_JUGADORES)
+                #Actualizar ventana
+                pg.display.update()
+            
+            if redibujarBotonIA:
+                self.dibujaBoton(self._botonJugadorIA,self._assetBotonIA, c.TEXTO_BOTON_IA)
+                #Actualizar ventana
+                pg.display.update()
+        else:
+            pg.quit()
         
-        #Detectar ratón sobre botones           
-        posicion = pg.mouse.get_pos()
-
-        antiguoAsset = self._assetBotonJugadores
-        #Boton jugador vs jugador
-        if self._botonJugadorJugador.collidepoint(posicion):
-            self._assetBotonJugadores = self._assetBotonJugadorJugadorEncima
-        else: 
-            self._assetBotonJugadores = self._assetBotonJugadorJugador
-
-        #Comprobar si la situación ha cambiado 
-        if self._assetBotonJugadores != antiguoAsset:
-            redibujarBotonJugadores = True
-        else: 
-            redibujarBotonJugadores = False
-
-        #Boton jugador vs IA
-        antiguoAsset = self._assetBotonIA
-
-        if self._botonJugadorIA.collidepoint(posicion):
-            self._assetBotonIA = self._assetBotonJugadorIAEncima
-        else: 
-            self._assetBotonIA = self._assetBotonJugadorIA
-
-        #Comprobar si la situación ha cambiado 
-        if self._assetBotonIA != antiguoAsset:
-            redibujarBotonIA = True
-        else: 
-            redibujarBotonIA = False
-
-        if redibujarBotonJugadores:
-            self.dibujaBoton(self._botonJugadorJugador,self._assetBotonJugadores, c.TEXTO_BOTON_JUGADORES)
-            #Actualizar ventana
-            pg.display.update()
-        
-        if redibujarBotonIA:
-            self.dibujaBoton(self._botonJugadorIA,self._assetBotonIA, c.TEXTO_BOTON_IA)
-            #Actualizar ventana
-            pg.display.update()
-    
     def iniciaMenu(self):
 
         while(True):

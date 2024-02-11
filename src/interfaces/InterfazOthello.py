@@ -238,12 +238,12 @@ class InterfazOthello ():
             assetTurno = self._asset_blanca_movimiento
 
         #Colocar la ficha 
-        self._ventana.blit(assetTurno, (c.LOCALIZACION_CENTRO_DERECHA-75+offset,self._inicioTextoMovimientosY))
+        self._ventana.blit(assetTurno, (c.LOCALIZACION_CENTRO_DERECHA-c.SEPARACION_FICHA_TEXTO+offset,self._inicioTextoMovimientosY))
         
         #Mostrar el movimiento realizado
         columna = c.VALOR_COLUMNAS[str(columna)]
-        fila = str(fila)
-        texto = fila + columna
+        fila = c.VALOR_FILAS[str(fila)]
+        texto =  str(self._numeroMovimientos + 1) + ". " + columna + fila
         self.dibujarTextoEspaciadoMovimientos(texto,c.ESPACIADO_MOVIMIENTOS,c.MARRON_RGB,offset)
 
         #Incrementar valores necesarios
@@ -255,8 +255,38 @@ class InterfazOthello ():
 
     def gestionEventos(self, motor: IMotorDeJuego):
         """Gestionar eventos en la interfaz"""
+        fin = False
 
-        #TODO: cambiar de turno cuando no se pueda colocar según las reglas de colocación
+        if (not motor.comprobarPosiblesMovimientos()):
+            print("NO PUEDE COLOCAR, CAMBIAR TURNO AL SIGUIENTE")
+
+            #Cambiar el turno al siguiente jugador
+            motor.cambiarTurno(motor.getJugadorActivo())
+            self.indicarCambioDeTurno(motor.getJugadorActivo().getTurno())
+
+        if (motor.comprobarFinJuego()):
+            #TODO: TERMINAR LA PARTIDA CON INTERFAZ PERSONALIZADA
+            ganador = motor.comprobarGanador()
+            fin = True
+
+            if (ganador == c.EMPATE_ENTRE_JUGADORES):
+                #Empate entre jugadores
+                pg.image.save(self._ventana, "../Assets/empate.png")
+                print("EMPATE")
+                pg.quit()
+                return fin
+            elif (ganador == c.JUGADOR1_GANA):
+                #Ganan las negras
+                print("GANAN LAS NEGRAS")
+                pg.image.save(self._ventana, "../Assets/negras.png")
+                pg.quit()
+                return fin
+            else:
+                #Ganan las blancas
+                print("GANAN LAS BLANCAS")
+                pg.image.save(self._ventana, "../Assets/blancas.png")
+                pg.quit()
+                return fin
 
         for event in pg.event.get():
             #Cerrar ventana
@@ -282,8 +312,9 @@ class InterfazOthello ():
 
                             #Indicar que jugador coloca la ficha en el tablero
                             motor.modificarValorCelda(fila,columna,motor.getJugadorActivo().getTurno())
+                            motor.aumentaCantidadFichasJugador(motor.getJugadorActivo())
 
-                            #Colocar ficha del jugador
+                            #Colocar ficha del jugador en la interfaz
                             ficha = self.obtenerFichaJugador(motor)
                             self.colocarFicha(ficha,fila,columna)  
 
@@ -293,14 +324,16 @@ class InterfazOthello ():
                             #Capturar fichas enemigas
                             motor.cambiarValorFichasEncerradas(celdas)
                             self.cambiarFichasEncerradas(motor, celdas)
+                            motor.modificarCantidadFichasJugador(motor.getJugadorActivo(), len(celdas))
 
                             #Turno del siguiente jugador
                             motor.cambiarTurno(motor.getJugadorActivo())
                             self.indicarCambioDeTurno(motor.getJugadorActivo().getTurno())
 
-                            #TODO: BORRAR AL ACABAR
                             print(motor.getTablero())
                             print(f"Columna: {columna}, fila: {fila}")
+
+        return fin
 
                          
 
