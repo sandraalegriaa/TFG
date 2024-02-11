@@ -16,6 +16,10 @@ class InterfazOthello ():
     _asset_blanca_trans: pg.image
     _asset_negra_trans: pg.image
     _asset_fondo: pg.image
+    _asset_blanca_turno: pg.image
+    _asset_negra_turno: pg.image
+
+    _fuente: pg.font
 
     def __init__(self):
 
@@ -26,7 +30,12 @@ class InterfazOthello ():
         self._ventana = self.configurarVentana()
 
         #Cargar assets de la interfaz
-        self._asset_fondo, self._asset_tablero, self._asset_blanca, self._asset_negra, self._asset_blanca_trans, self._asset_negra_trans = self.cargarImagenes()
+        self._asset_fondo, self._asset_tablero, self._asset_blanca, self._asset_negra, self._asset_blanca_trans, self._asset_negra_trans, self._asset_blanca_turno, self._asset_negra_turno = self.cargarImagenes()
+
+        #Cargar fuentes
+        self._fuente = pg.font.Font(c.FUENTE, 30) 
+        self._fuente.set_bold(True)
+
 
     def configurarVentana(self):
         """Configurar la ventana de la aplicación"""
@@ -54,6 +63,11 @@ class InterfazOthello ():
         self._ventana.blit(self._asset_negra, self.deCeldaAPixel(4,c.D))
         self._ventana.blit(self._asset_negra, self.deCeldaAPixel(3,c.E))
 
+        #Texto turno
+        self.dibujarTextoEspaciadoTurno(c.TURNO,c.ESPACIADO_TURNO,c.VERDE_RGB)
+        #Empieza el primer jugador
+        self.indicarCambioDeTurno(c.P1)
+
         #Actualizar ventana
         pg.display.update()
 
@@ -73,7 +87,11 @@ class InterfazOthello ():
 
         asset_negra_trans = self.imagen(c.IMG_FICHA_NEGRA,c.DIM_FICHA)
 
-        return asset_fondo, asset_tablero, asset_blanca, asset_negra, asset_blanca_trans, asset_negra_trans
+        _asset_blanca_turno = self.imagen(c.IMG_FICHA_BLANCA,c.DIM_FICHA_TURNO)
+
+        _asset_negra_turno = self.imagen(c.IMG_FICHA_NEGRA, c.DIM_FICHA_TURNO)
+
+        return asset_fondo, asset_tablero, asset_blanca, asset_negra, asset_blanca_trans, asset_negra_trans, _asset_blanca_turno, _asset_negra_turno
     
     def imagen(self,ruta,dim):
         """Obtener imagen de un asset"""
@@ -132,6 +150,32 @@ class InterfazOthello ():
         for [fila,columna] in celdas:
             self.colocarFicha(ficha,fila,columna)
 
+    def dibujarTextoEspaciadoTurno(self,texto,espaciado,color):
+        """Dibujar en la interfaz el texto del título espaciado"""
+
+        dimensionTotal = sum([self._fuente.size(letra)[0] + espaciado for letra in texto]) - espaciado
+        xInicial = c.LOCALIZACION_CENTRO_DERECHA - dimensionTotal
+        yInicial = c.ORIGEN_MARGO['y']
+
+        # Renderizar cada letra del texto individualmente con espaciado
+        for letra in texto:
+            assetLetra = self._fuente.render(letra, True, color)
+            self._ventana.blit(assetLetra, (xInicial, yInicial))
+            # Ajustar xInicial para la siguiente letra
+            xInicial += assetLetra.get_width() + espaciado
+    
+    def indicarCambioDeTurno(self,jugador:int):
+        """Indicar visualmente en la interfaz el turno del jugador activo"""
+
+        if jugador == c.P1:
+            assetTurno = self._asset_negra_turno
+        else: 
+            assetTurno = self._asset_blanca_turno
+
+        #Colocar la ficha 
+        self._ventana.blit(assetTurno, (c.LOCALIZACION_CENTRO_DERECHA+20,c.ORIGEN_MARGO['y']))
+        #Actualizar ventana
+        pg.display.update()
 
     def gestionEventos(self, motor: IMotorDeJuego):
         """Gestionar eventos en la interfaz"""
@@ -172,6 +216,7 @@ class InterfazOthello ():
 
                             #Turno del siguiente jugador
                             motor.cambiarTurno(motor.getJugadorActivo())
+                            self.indicarCambioDeTurno(motor.getJugadorActivo().getTurno())
 
                             #TODO: BORRAR AL ACABAR
                             print(motor.getTablero())
