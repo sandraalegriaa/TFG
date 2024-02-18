@@ -9,16 +9,17 @@ from tkinter import filedialog
 import os
 
 from motores import IMotorDeJuego
+from Sprites import Ficha
 
 @dataclass
 class InterfazOthello ():
 
+    #Sprites
+    _grupoSpritesFichas : pg.sprite.Group
+    _nuevaFicha: pg.sprite.Group
+
     #Assets
     _asset_tablero: pg.image
-    _asset_blanca: pg.image
-    _asset_negra: pg.image
-    _asset_blanca_trans: pg.image
-    _asset_negra_trans: pg.image
     _asset_fondo: pg.image
     _asset_blanca_turno: pg.image
     _asset_negra_turno: pg.image
@@ -54,7 +55,14 @@ class InterfazOthello ():
         self._ventana = self.configurarVentana()
 
         #Cargar assets de la interfaz
-        self._asset_fondo, self._asset_tablero, self._asset_blanca, self._asset_negra, self._asset_blanca_trans, self._asset_negra_trans, self._asset_blanca_turno, self._asset_negra_turno, self._asset_blanca_movimiento, self._asset_negra_movimiento, self._asset_tapar_texto, self._assetBoton, self._assetBotonEncima = self.cargarImagenes()
+        self._asset_fondo, self._asset_tablero, self._asset_blanca_turno, self._asset_negra_turno, self._asset_blanca_movimiento, self._asset_negra_movimiento, self._asset_tapar_texto, self._assetBoton, self._assetBotonEncima = self.cargarImagenes()
+
+        #Incializar assets fichas
+        Ficha.cargarImagenes()
+
+        #Crear grupo de sprites de las fichas
+        self._grupoSpritesFichas = pg.sprite.Group()
+        self._nuevaFicha = pg.sprite.Group()
 
         #Cargar fuentes
         self._fuenteTurno = pg.font.Font(c.FUENTE, 30) 
@@ -91,12 +99,12 @@ class InterfazOthello ():
         self._ventana.blit(self._asset_tablero, (0,0))
 
         #Fichas blancas 
-        self._ventana.blit(self._asset_blanca, self.deCeldaAPixel(3,c.D))
-        self._ventana.blit(self._asset_blanca, self.deCeldaAPixel(4,c.E))
+        self.colocarFicha(c.FICHA_BLANCA,3,c.D)
+        self.colocarFicha(c.FICHA_BLANCA,4,c.E)
 
         #Fichas negras
-        self._ventana.blit(self._asset_negra, self.deCeldaAPixel(4,c.D))
-        self._ventana.blit(self._asset_negra, self.deCeldaAPixel(3,c.E))
+        self.colocarFicha(c.FICHA_NEGRA,4,c.D)
+        self.colocarFicha(c.FICHA_NEGRA,3,c.E)
 
         #Texto turno
         self.dibujarTextoEspaciadoTurno(c.TURNO,c.ESPACIADO_TURNO,c.VERDE_RGB)
@@ -113,12 +121,6 @@ class InterfazOthello ():
         asset_fondo = self.imagen(c.IMG_FONDO_JUEGO,c.VENTANA_ANCHO)
         asset_tablero = self.imagen(c.IMG_TABLERO,700)
 
-        asset_blanca = self.imagen(c.IMG_FICHA_BLANCA,c.DIM_FICHA)
-        asset_negra = self.imagen(c.IMG_FICHA_NEGRA, c.DIM_FICHA)
-
-        asset_blanca_trans = self.imagen(c.IMG_FICHA_BLANCA,c.DIM_FICHA)
-        asset_negra_trans = self.imagen(c.IMG_FICHA_NEGRA,c.DIM_FICHA)
-
         _asset_blanca_turno = self.imagen(c.IMG_FICHA_BLANCA,c.DIM_FICHA_TURNO)
         _asset_negra_turno = self.imagen(c.IMG_FICHA_NEGRA, c.DIM_FICHA_TURNO)
 
@@ -130,7 +132,7 @@ class InterfazOthello ():
         _asset_boton = self.imagenDimesiones(c.IMG_BOTON,c.ANCHURA_BOTON_GUARDADO,c.ALTURA_BOTON_GUARDADO)
         _asset_boton_encima = self.imagenDimesiones(c.IMG_BOTON_ENCIMA,c.ANCHURA_BOTON_GUARDADO,c.ALTURA_BOTON_GUARDADO)
 
-        return asset_fondo, asset_tablero, asset_blanca, asset_negra, asset_blanca_trans, asset_negra_trans, _asset_blanca_turno, _asset_negra_turno, _asset_blanca_movimiento, _asset_negra_movimiento, _asset_tapar_texto, _asset_boton, _asset_boton_encima
+        return asset_fondo, asset_tablero, _asset_blanca_turno, _asset_negra_turno, _asset_blanca_movimiento, _asset_negra_movimiento, _asset_tapar_texto, _asset_boton, _asset_boton_encima
     
     def imagen(self,ruta,dim):
         """Obtener imagen de un asset"""
@@ -178,11 +180,24 @@ class InterfazOthello ():
 
         return fila,columna
             
-    def colocarFicha(self,ficha,fila,columna):
+    def colocarFicha(self,color:str,fila:int,columna:int):
         """Colocar la ficha en el tablero y actualizar el tablero para que se visualice correctamente"""
 
-        self._ventana.blit(ficha, (c.ORIGEN_TABLERO['x'] + columna * c.DIM_CELDA,c.ORIGEN_TABLERO['y'] + fila * c.DIM_CELDA))
-        pg.display.update()
+        # Convertir fila,c olumna a coordenadas de píxel
+        pixelSupIzq = self.deCeldaAPixel(fila, columna)
+
+        # Crear nueva ficha 
+        nueva_ficha = Ficha(color, (fila, columna), pixelSupIzq)
+
+        # Añadir ficha al grupo
+        self._grupoSpritesFichas.add(nueva_ficha)
+        self._nuevaFicha.add(nueva_ficha)
+
+        #Dibujar ficha
+        self._nuevaFicha.draw(self._ventana)
+        #Vaciar
+        self._nuevaFicha.empty()
+
 
     def obtenerFichaJugador(self, motor : IMotorDeJuego):
         """"Obtener asset de la ficha correspondiente al jugador activo"""
@@ -190,19 +205,19 @@ class InterfazOthello ():
         jugadorActivo = motor.getJugadorActivo()
 
         if (jugadorActivo.getColor() == c.NEGRO):
-            ficha = self._asset_negra
+            colorFicha = c.FICHA_NEGRA
         else:
-            ficha = self._asset_blanca
+            colorFicha = c.FICHA_BLANCA
     
-        return ficha
+        return colorFicha
     
     def cambiarFichasEncerradas(self, motor: IMotorDeJuego, celdas):
-        """Cambiar assets de las fichas encerradas por las fichas del jugador actual"""
+        """Cambiar sprite de las fichas encerradas por las fichas del jugador actual"""
 
-        ficha = self.obtenerFichaJugador(motor)
+        colorFicha = self.obtenerFichaJugador(motor)
 
         for [fila,columna] in celdas:
-            self.colocarFicha(ficha,fila,columna)
+            self.colocarFicha(colorFicha,fila,columna)
 
     def dibujarTextoEspaciadoTurno(self,texto,espaciado,color):
         """Dibujar en la interfaz el texto indicador del turno espaciado"""
@@ -400,7 +415,6 @@ class InterfazOthello ():
 
     def gestionEventos(self, motor: IMotorDeJuego):
         """Gestionar eventos en la interfaz"""
-
         if (self._fin):
             """Esperar a que el usuario cierre la ventana"""
             for event in pg.event.get():
@@ -446,10 +460,10 @@ class InterfazOthello ():
                                 #Indicar que jugador coloca la ficha en el tablero
                                 motor.modificarValorCelda(fila,columna,motor.getJugadorActivo().getTurno())
                                 motor.aumentaCantidadFichasJugador(motor.getJugadorActivo())
-
+                                
                                 #Colocar ficha del jugador en la interfaz
-                                ficha = self.obtenerFichaJugador(motor)
-                                self.colocarFicha(ficha,fila,columna)  
+                                colorFicha = self.obtenerFichaJugador(motor)
+                                self.colocarFicha(colorFicha,fila,columna)  
 
                                 #Indicar movimiento realizado     
                                 self.indicarMovimiento(motor.getJugadorActivo().getTurno(),fila,columna)

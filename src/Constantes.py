@@ -45,11 +45,18 @@ ESPACIADO_MOVIMIENTOS = 1
 IMG_TABLERO = "../Assets/Board-othello.png"
 IMG_FICHA_BLANCA = "../Assets/Pieza-blanca.png"
 IMG_FICHA_NEGRA = "../Assets/Pieza-negra.png"
+IMG_FICHA_BLANCA_SEMITRANSPARENTE = "../Assets/Pieza-blanca-semitransparente.png"
+IMG_FICHA_NEGRA_SEMITRANSPARENTE = "../Assets/Pieza-negra-semitransparente.png"
+
 IMG_FONDO_MENU_PRINCIPAL = "../Assets/Fondo-Menu-Tablero.png"
 IMG_FONDO_JUEGO = "../Assets/Fondo-Menu.png"
 IMG_BOTON = "../Assets/Boton.png"
 IMG_BOTON_ENCIMA = "../Assets/Boton-Encima.png"
 IMG_TAPA_TEXTO = "../Assets/Tapar-Texto.png"
+
+#Fichas
+FICHA_BLANCA = 'blanca'
+FICHA_NEGRA = 'negra'
 
 #Botones
 ANCHURA_BOTON = 250
