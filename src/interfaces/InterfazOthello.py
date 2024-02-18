@@ -34,6 +34,7 @@ class InterfazOthello ():
     _asset_tapar_texto: pg.image
     _asset_celda_oscura : pg.image
     _asset_celda_clara : pg.image
+    _asset_guardar_partida: pg.image
 
     #Botones
     _assetBoton: pg.image
@@ -63,7 +64,7 @@ class InterfazOthello ():
         self._ventana = self.configurarVentana()
 
         #Cargar assets de la interfaz
-        self._asset_fondo, self._asset_tablero, self._asset_blanca_turno, self._asset_negra_turno, self._asset_blanca_movimiento, self._asset_negra_movimiento, self._asset_tapar_texto, self._assetBoton, self._assetBotonEncima, self._asset_celda_oscura, self._asset_celda_clara = self.cargarImagenes()
+        self._asset_fondo, self._asset_tablero, self._asset_blanca_turno, self._asset_negra_turno, self._asset_blanca_movimiento, self._asset_negra_movimiento, self._asset_tapar_texto, self._assetBoton, self._assetBotonEncima, self._asset_celda_oscura, self._asset_celda_clara, self._asset_guardar_partida = self.cargarImagenes()
 
         #Incializar assets fichas
         Ficha.cargarImagenes()
@@ -149,7 +150,9 @@ class InterfazOthello ():
         _asset_celda_oscura = self.imagen(c.IMG_CELDA_OSCURA,c.DIM_CELDA)
         _asset_celda_clara = self.imagen(c.IMG_CELDA_CLARA,c.DIM_CELDA)
 
-        return asset_fondo, asset_tablero, _asset_blanca_turno, _asset_negra_turno, _asset_blanca_movimiento, _asset_negra_movimiento, _asset_tapar_texto, _asset_boton, _asset_boton_encima, _asset_celda_oscura, _asset_celda_clara
+        _asset_guardar_partida = self.imagen(c.IMG_GUARDAR_PARTIDA,c.DIM_BOTON_GUARDADO)
+
+        return asset_fondo, asset_tablero, _asset_blanca_turno, _asset_negra_turno, _asset_blanca_movimiento, _asset_negra_movimiento, _asset_tapar_texto, _asset_boton, _asset_boton_encima, _asset_celda_oscura, _asset_celda_clara, _asset_guardar_partida
     
     def imagen(self,ruta,dim):
         """Obtener imagen de un asset"""
@@ -438,12 +441,15 @@ class InterfazOthello ():
         #Escribir texto del ganador
         self.dibujarTextoEspaciadoGanador(textoGanador,c.ESPACIADO_GANADOR,color)
 
-        #Generar botón de guardado
-        self._botonGuardar = pg.Rect(c.LOCALIZACION_CENTRO_DERECHA-120,c.FIN_TABLERO['y']+10, c.ANCHURA_BOTON_GUARDADO, c.ALTURA_BOTON_GUARDADO)
-        self.dibujaBoton(self._botonGuardar,self._assetBoton, c.TEXTO_BOTON_GUARDADO)
+        #Generar botón de guardado 
+        #self._botonGuardar = pg.Rect(c.LOCALIZACION_CENTRO_DERECHA-120,c.FIN_TABLERO['y']+10, c.ANCHURA_BOTON_GUARDADO, c.ALTURA_BOTON_GUARDADO)
+        #self.dibujaBoton(self._botonGuardar,self._assetBoton, c.TEXTO_BOTON_GUARDADO)
+
+        self._botonGuardar = pg.Rect(c.LOCALIZACION_CENTRO_DERECHA+120,c.FIN_TABLERO['y']+30, c.DIM_BOTON_GUARDADO, c.DIM_BOTON_GUARDADO)
+        self.dibujaBoton(self._botonGuardar,self._asset_guardar_partida, " ")
 
         #Escribir indicador del botón 
-        self.dibujarTextoEspaciadoBotones(c.TEXTO_BOTON_GUARDADO,c.ESPACIADO_BOTONES,c.MARRON_RGB,self._botonGuardar.x,self._botonGuardar.y)
+        #self.dibujarTextoEspaciadoBotones(c.TEXTO_BOTON_GUARDADO,c.ESPACIADO_BOTONES,c.MARRON_RGB,self._botonGuardar.x,self._botonGuardar.y)
 
         #Actualizar ventana
         pg.display.update()  
@@ -501,7 +507,7 @@ class InterfazOthello ():
 
                 #Ocultar cursor dentro del tablero
                 if (self.posicionDentroDelTablero(pos)):
-                    pg.mouse.set_visible(False)
+                    pg.mouse.set_visible(True)
                 else: 
                     pg.mouse.set_visible(True)
 

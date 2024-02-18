@@ -4,7 +4,7 @@ TITULO_INTERFAZ = "Othello"
 TITULO = "OTHELLO"
 
 #Dimensiones
-VENTANA_LARGO = 700 
+VENTANA_LARGO = 700
 VENTANA_ANCHO = 1100
 ORIGEN_MARGO = {'x':30,'y':30}
 ORIGEN_TABLERO = {'x':117,'y':117}
@@ -16,6 +16,7 @@ DIM_CELDA = DIM_TABLERO / CELDAS
 DIM_FICHA = DIM_CELDA
 LOCALIZACION_CENTRO_DERECHA =  FIN_MARCO['x'] + ((VENTANA_ANCHO - FIN_MARCO['x']) //2 )
 DIM_TAPA_TEXTO = {'x':200,'y':45}
+DIM_BOTON_GUARDADO = 45
 
 #Turno 
 TURNO = "TURNO:"
@@ -53,6 +54,7 @@ IMG_BOTON_ENCIMA = "../Assets/Boton-Encima.png"
 IMG_TAPA_TEXTO = "../Assets/Tapar-Texto.png"
 IMG_CELDA_OSCURA = "../Assets/Celda-Oscura.png"
 IMG_CELDA_CLARA = "../Assets/Celda-Clara.png"
+IMG_GUARDAR_PARTIDA = "../Assets/Guardar-Partida.png"
 
 #Fichas
 FICHA_BLANCA = 'blanca'
