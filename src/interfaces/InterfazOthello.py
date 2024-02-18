@@ -10,6 +10,7 @@ import os
 
 from motores import IMotorDeJuego
 from Sprites import Ficha
+from Sprites import FichaSemiTransparente
 
 @dataclass
 class InterfazOthello ():
@@ -17,6 +18,11 @@ class InterfazOthello ():
     #Sprites
     _grupoSpritesFichas : pg.sprite.Group
     _nuevaFicha: pg.sprite.Group
+
+    _grupoSpritesFichasSemitransparente : pg.sprite.Group
+    _nuevaFichasSemitransparente : pg.sprite.Group
+
+    _angituaFichaSemitransparente : tuple[int]
 
     #Assets
     _asset_tablero: pg.image
@@ -26,6 +32,8 @@ class InterfazOthello ():
     _asset_blanca_movimiento: pg.image
     _asset_negra_movimiento: pg.image
     _asset_tapar_texto: pg.image
+    _asset_celda_oscura : pg.image
+    _asset_celda_clara : pg.image
 
     #Botones
     _assetBoton: pg.image
@@ -55,14 +63,20 @@ class InterfazOthello ():
         self._ventana = self.configurarVentana()
 
         #Cargar assets de la interfaz
-        self._asset_fondo, self._asset_tablero, self._asset_blanca_turno, self._asset_negra_turno, self._asset_blanca_movimiento, self._asset_negra_movimiento, self._asset_tapar_texto, self._assetBoton, self._assetBotonEncima = self.cargarImagenes()
+        self._asset_fondo, self._asset_tablero, self._asset_blanca_turno, self._asset_negra_turno, self._asset_blanca_movimiento, self._asset_negra_movimiento, self._asset_tapar_texto, self._assetBoton, self._assetBotonEncima, self._asset_celda_oscura, self._asset_celda_clara = self.cargarImagenes()
 
         #Incializar assets fichas
         Ficha.cargarImagenes()
+        FichaSemiTransparente.cargarImagenes()
 
         #Crear grupo de sprites de las fichas
         self._grupoSpritesFichas = pg.sprite.Group()
         self._nuevaFicha = pg.sprite.Group()
+
+        self._grupoSpritesFichasSemitransparente = pg.sprite.Group()
+        self._nuevaFichaSemitransparente = pg.sprite.Group()
+
+        self._angituaFichaSemitransparente = None
 
         #Cargar fuentes
         self._fuenteTurno = pg.font.Font(c.FUENTE, 30) 
@@ -132,7 +146,10 @@ class InterfazOthello ():
         _asset_boton = self.imagenDimesiones(c.IMG_BOTON,c.ANCHURA_BOTON_GUARDADO,c.ALTURA_BOTON_GUARDADO)
         _asset_boton_encima = self.imagenDimesiones(c.IMG_BOTON_ENCIMA,c.ANCHURA_BOTON_GUARDADO,c.ALTURA_BOTON_GUARDADO)
 
-        return asset_fondo, asset_tablero, _asset_blanca_turno, _asset_negra_turno, _asset_blanca_movimiento, _asset_negra_movimiento, _asset_tapar_texto, _asset_boton, _asset_boton_encima
+        _asset_celda_oscura = self.imagen(c.IMG_CELDA_OSCURA,c.DIM_CELDA)
+        _asset_celda_clara = self.imagen(c.IMG_CELDA_CLARA,c.DIM_CELDA)
+
+        return asset_fondo, asset_tablero, _asset_blanca_turno, _asset_negra_turno, _asset_blanca_movimiento, _asset_negra_movimiento, _asset_tapar_texto, _asset_boton, _asset_boton_encima, _asset_celda_oscura, _asset_celda_clara
     
     def imagen(self,ruta,dim):
         """Obtener imagen de un asset"""
@@ -197,6 +214,51 @@ class InterfazOthello ():
         self._nuevaFicha.draw(self._ventana)
         #Vaciar
         self._nuevaFicha.empty()
+
+        #Actualizar ventana
+        pg.display.update()
+
+    def colocarFichaSemitransparente(self,color:str,fila:int,columna:int):
+        """Colocar la ficha en el tablero y actualizar el tablero para que se visualice correctamente"""
+
+        # Convertir fila,c olumna a coordenadas de píxel
+        pixelSupIzq = self.deCeldaAPixel(fila, columna)
+
+        # Crear nueva ficha 
+        nueva_ficha = FichaSemiTransparente(color, (fila, columna), pixelSupIzq)
+
+        # Añadir ficha al grupo
+        self._grupoSpritesFichasSemitransparente.add(nueva_ficha)
+        self._nuevaFichaSemitransparente.add(nueva_ficha)
+
+        #Dibujar ficha
+        self._nuevaFichaSemitransparente.draw(self._ventana)
+        #Vaciar
+        self._nuevaFichaSemitransparente.empty()
+
+        #Actualizar ventana
+        pg.display.update()
+
+    def eliminarFichaSemitrasparente(self,fila:int,columna:int):
+        eliminar = None
+
+        for sprite in self._grupoSpritesFichasSemitransparente:
+            if(sprite.pos == (fila,columna)):
+                eliminar = sprite
+                break
+                                
+        if (eliminar != None):
+                if ((fila,columna) in c.CELDAS_OSCURAS):
+                    celda = self._asset_celda_oscura
+                else: 
+                    celda = self._asset_celda_clara
+
+                self._grupoSpritesFichasSemitransparente.remove(eliminar)
+
+                self._ventana.blit(celda, self.deCeldaAPixel(fila,columna))
+
+                #Actualizar ventana
+                pg.display.update()
 
 
     def obtenerFichaJugador(self, motor : IMotorDeJuego):
@@ -341,6 +403,13 @@ class InterfazOthello ():
         self._ventana.blit(asset, boton.topleft)
         self.dibujarTextoEspaciadoBotones(texto,c.ESPACIADO_BOTONES,c.MARRON_RGB,boton.x,boton.y)
 
+    def posicionDentroDelTablero(self,pos:tuple[int]):
+
+        x = pos[0]
+        y = pos[1]
+
+        return (x >= c.ORIGEN_TABLERO['x'] and x <= c.FIN_TABLERO['x']) and (y >= c.ORIGEN_TABLERO['y'] and y <= c.FIN_TABLERO['y'])
+
     def finPartida(self,motor:IMotorDeJuego):
 
         self._fin = True
@@ -425,6 +494,31 @@ class InterfazOthello ():
 
         if (not self._fin):
             """El juego sigue en marcha"""
+            #Coordenadas del ratón
+            pos = pg.mouse.get_pos()
+
+            if(pos != None):
+
+                #Ocultar cursor dentro del tablero
+                if (self.posicionDentroDelTablero(pos)):
+                    pg.mouse.set_visible(False)
+                else: 
+                    pg.mouse.set_visible(True)
+
+                fila, columna = self.obtenerCelda(pos)
+
+            if(motor.dentroCeldas(fila,columna) and motor.obtenerValorCelda(fila,columna) == 0):
+                if (self._angituaFichaSemitransparente != (fila,columna)):
+                    #Colocar ficha del jugador en la interfaz
+                    colorFicha = self.obtenerFichaJugador(motor)
+                    self.colocarFichaSemitransparente(colorFicha,fila,columna)
+
+                    #Eliminar antigua ficha semitransparente colocada
+                    if (self._angituaFichaSemitransparente != None and motor.obtenerValorCelda(self._angituaFichaSemitransparente[0],self._angituaFichaSemitransparente[1]) == 0):
+                        self.eliminarFichaSemitrasparente(self._angituaFichaSemitransparente[0], self._angituaFichaSemitransparente[1])
+
+                    self._angituaFichaSemitransparente = (fila,columna)
+
             if (not motor.comprobarPosiblesMovimientos()):
                 print("NO PUEDE COLOCAR, CAMBIAR TURNO AL SIGUIENTE")
 

@@ -6,7 +6,6 @@ TITULO = "OTHELLO"
 #Dimensiones
 VENTANA_LARGO = 700 
 VENTANA_ANCHO = 1100
-
 ORIGEN_MARGO = {'x':30,'y':30}
 ORIGEN_TABLERO = {'x':117,'y':117}
 FIN_MARCO = {'x':667,'y':667}
@@ -47,12 +46,13 @@ IMG_FICHA_BLANCA = "../Assets/Pieza-blanca.png"
 IMG_FICHA_NEGRA = "../Assets/Pieza-negra.png"
 IMG_FICHA_BLANCA_SEMITRANSPARENTE = "../Assets/Pieza-blanca-semitransparente.png"
 IMG_FICHA_NEGRA_SEMITRANSPARENTE = "../Assets/Pieza-negra-semitransparente.png"
-
 IMG_FONDO_MENU_PRINCIPAL = "../Assets/Fondo-Menu-Tablero.png"
 IMG_FONDO_JUEGO = "../Assets/Fondo-Menu.png"
 IMG_BOTON = "../Assets/Boton.png"
 IMG_BOTON_ENCIMA = "../Assets/Boton-Encima.png"
 IMG_TAPA_TEXTO = "../Assets/Tapar-Texto.png"
+IMG_CELDA_OSCURA = "../Assets/Celda-Oscura.png"
+IMG_CELDA_CLARA = "../Assets/Celda-Clara.png"
 
 #Fichas
 FICHA_BLANCA = 'blanca'
@@ -100,3 +100,7 @@ EMPATE = "EMPATE"
 JUGADOR1_GANA = 1
 JUGADOR2_GANA = 2
 EMPATE_ENTRE_JUGADORES = 0
+
+#Celdas
+CELDAS_OSCURAS = [(0,A),(0,C),(0,E),(0,G),(1,B),(1,D),(1,F),(1,H),(2,A),(2,C),(2,E),(2,G),(3,B),(3,D),(3,F),(3,H),
+                  (4,A),(4,C),(4,E),(4,G),(5,B),(5,D),(5,F),(5,H),(6,A),(6,C),(6,E),(6,G),(7,B),(7,D),(7,F),(7,H)]
