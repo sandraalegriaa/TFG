@@ -95,6 +95,8 @@ class InterfazOthello ():
 
         self._fin = False
 
+        self.inicializarInterfaz()
+
     def configurarVentana(self):
         """Configurar la ventana de la aplicación"""
 
@@ -203,7 +205,7 @@ class InterfazOthello ():
     def colocarFicha(self,color:str,fila:int,columna:int):
         """Colocar la ficha en el tablero y actualizar el tablero para que se visualice correctamente"""
 
-        # Convertir fila,c olumna a coordenadas de píxel
+        # Convertir fila, columna a coordenadas de píxel
         pixelSupIzq = self.deCeldaAPixel(fila, columna)
 
         # Crear nueva ficha 
@@ -224,7 +226,7 @@ class InterfazOthello ():
     def colocarFichaSemitransparente(self,color:str,fila:int,columna:int):
         """Colocar la ficha en el tablero y actualizar el tablero para que se visualice correctamente"""
 
-        # Convertir fila,c olumna a coordenadas de píxel
+        # Convertir fila, columna a coordenadas de píxel
         pixelSupIzq = self.deCeldaAPixel(fila, columna)
 
         # Crear nueva ficha 
@@ -441,15 +443,8 @@ class InterfazOthello ():
         #Escribir texto del ganador
         self.dibujarTextoEspaciadoGanador(textoGanador,c.ESPACIADO_GANADOR,color)
 
-        #Generar botón de guardado 
-        #self._botonGuardar = pg.Rect(c.LOCALIZACION_CENTRO_DERECHA-120,c.FIN_TABLERO['y']+10, c.ANCHURA_BOTON_GUARDADO, c.ALTURA_BOTON_GUARDADO)
-        #self.dibujaBoton(self._botonGuardar,self._assetBoton, c.TEXTO_BOTON_GUARDADO)
-
         self._botonGuardar = pg.Rect(c.LOCALIZACION_CENTRO_DERECHA+120,c.FIN_TABLERO['y']+30, c.DIM_BOTON_GUARDADO, c.DIM_BOTON_GUARDADO)
         self.dibujaBoton(self._botonGuardar,self._asset_guardar_partida, " ")
-
-        #Escribir indicador del botón 
-        #self.dibujarTextoEspaciadoBotones(c.TEXTO_BOTON_GUARDADO,c.ESPACIADO_BOTONES,c.MARRON_RGB,self._botonGuardar.x,self._botonGuardar.y)
 
         #Actualizar ventana
         pg.display.update()  

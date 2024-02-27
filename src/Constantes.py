@@ -106,3 +106,9 @@ EMPATE_ENTRE_JUGADORES = 0
 #Celdas
 CELDAS_OSCURAS = [(0,A),(0,C),(0,E),(0,G),(1,B),(1,D),(1,F),(1,H),(2,A),(2,C),(2,E),(2,G),(3,B),(3,D),(3,F),(3,H),
                   (4,A),(4,C),(4,E),(4,G),(5,B),(5,D),(5,F),(5,H),(6,A),(6,C),(6,E),(6,G),(7,B),(7,D),(7,F),(7,H)]
+
+
+#Inteligencia Artificial
+EVALUADOR_RANDOM = 0
+EVALUADOR_ESQUINAS = 1
+MAXIMA_PROFUNDIDAD_MINIMAX = 3

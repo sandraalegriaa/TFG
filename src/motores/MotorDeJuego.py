@@ -22,27 +22,65 @@ class MotorDeJuego ():
     _posibleMovimientoJ1: bool
     _posibleMovimientoJ2: bool
 
-    def __init__(self, jugador1, jugador2):
+    def __init__(self, jugador1, jugador2, tablero=None, fichasNegras=None, fichasBlancas=None, puedeMoverJ1= None, puedeMoverJ2 = None,tableroCompletado = None, jugadorActivo = None):
+
+        if tablero is not None:
+            # Usar tablero proporcionado
+            self._tablero = tablero
+        else:
+            # Inicializar un tablero
+            self._inicializarTablero()
 
         self._jugador1 = jugador1
         self._jugador2 = jugador2
 
         #Ambos jugadores pueden comenzar realizando movimientos 
-        self._posibleMovimientoJ1 = True
-        self._posibleMovimientoJ2 = True
+        if puedeMoverJ1 is not None:
+            # Usar valor proporcionado
+            self._posibleMovimientoJ1 = puedeMoverJ1
+        else: 
+            # Inicializar valor
+            self._posibleMovimientoJ1 = True
 
-        #El tablero comienza con huecos disponibles
-        self._tableroCompletado = False
+        if puedeMoverJ2 is not None:
+            # Usar valor proporcionado
+            self._posibleMovimientoJ2 = puedeMoverJ2
+        else:
+            # Inicializar valor
+            self._posibleMovimientoJ2 = True
+
+        
+        if tableroCompletado is not None:
+            # Usar valor proporcionado
+            self._tableroCompletado = tableroCompletado
+        else:
+            #El tablero comienza con huecos disponibles
+            self._tableroCompletado = False
 
         #Inicializar la cantidad de fichas de cada jugador según las reglas de inicialización del tablero
-        self._fichasNegras = 2
-        self._fichasBlancas = 2
+        if fichasNegras is not None:
+            # Usar valor proporcionado
+            self._fichasNegras = fichasNegras
+        else:
+            # Inicializar valor
+            self._fichasNegras = 2
 
-        #Realiza el primer movimiento el que maneje a las fichas negras
-        if self._jugador1.getColor() == c.NEGRO:
-            self._jugadorActivo = self._jugador1
-        else: 
-            self._jugadorActivo = self._jugador2
+        if fichasBlancas is not None:
+            # Usar valor proporcionado
+            self._fichasBlancas = fichasBlancas
+        else:
+            # Inicializar valor
+            self._fichasBlancas = 2
+
+        if jugadorActivo is not None:
+            # Usar valor proporcionado
+            self._jugadorActivo = jugadorActivo
+        else:
+            #Realiza el primer movimiento el que maneje a las fichas negras
+            if self._jugador1.getColor() == c.NEGRO:
+                self._jugadorActivo = self._jugador1
+            else: 
+                self._jugadorActivo = self._jugador2
 
     def getTablero(self) -> np.ndarray:
         """Devuelve el tablero de juego del motor de juego"""
@@ -69,8 +107,8 @@ class MotorDeJuego ():
 
         self._jugadorActivo = jugador
 
-    def _inicializarTablero (self, interfaz: IInterfaz):
-        """Iniciliza el tablero de juego siguiendo las reglas estándar y actualiza la interfaz"""
+    def _inicializarTablero (self):
+        """Iniciliza el tablero de juego siguiendo las reglas estándar"""
 
         #Fichas blancas
         self._tablero[3][c.D] = 2
@@ -79,9 +117,6 @@ class MotorDeJuego ():
         #Fichas negras
         self._tablero[4][c.D] = 1
         self._tablero[3][c.E] = 1
-
-        #Actualizar interfaz
-        interfaz.inicializarInterfaz()
 
     def obtenerValorCelda(self, fila:int, columna:int):
         """Obtener el valor de una celda en el tablero"""
@@ -107,15 +142,15 @@ class MotorDeJuego ():
 
         if jugadorActual.getTurno() == c.P1:
             self.setJugadorActivo(self._jugador2)
-            print("Cambio de turno a jugador 2")
+            #print("Cambio de turno a jugador 2")
         else: 
             self.setJugadorActivo(self._jugador1)
-            print("Cambio de turno a jugador 1")      
+            #print("Cambio de turno a jugador 1")      
     
     def juega(self, interfaz: IInterfaz):
         """Inicia el juego (incluida la inicialización del tablero)"""
 
-        self._inicializarTablero(interfaz)
+        #TODO: BORRAR self._inicializarTablero(interfaz)
 
         while(True):
             interfaz.gestionEventos(self)
@@ -149,6 +184,7 @@ class MotorDeJuego ():
             self._fichasNegras -= cantidadFichas
         
         #TODO: BORRAR
+        
         print(self._fichasNegras,self._fichasBlancas)
 
     def fichasContrariasEncerradas(self,filaColocacion:int,columnaColocacion:int):
@@ -190,7 +226,7 @@ class MotorDeJuego ():
     def comprobarFinJuego(self):
         """Comprobar si el juego se ha acabado porque:
           - No quedan casillas libres en el tablero. 
-          - Porque ningún jugador puede realizar movimientos."""
+          - Ningún jugador puede realizar movimientos."""
         
         fin = False
 
@@ -216,7 +252,7 @@ class MotorDeJuego ():
         return ganador
     
     def comprobarPosiblesMovimientos(self):
-        """Recorrer el tablero buscando si hay posibles movimientos para el jugador indicado"""
+        """Recorrer el tablero buscando si hay posibles movimientos para el jugador activo"""
         posible = False
 
         #Recorrer tablero comprobando cada celda
@@ -235,3 +271,34 @@ class MotorDeJuego ():
             self._posibleMovimientoJ2 = posible
         
         return posible
+    
+    def posiblesMovimientos(self):
+        """Recorrer el tablero buscando los posibles movimientos para el jugador activo"""
+        movimientos = []
+
+        #Recorrer tablero comprobando cada celda
+        for fila in range(c.CELDAS):
+            for columna in range(c.CELDAS):
+                if (self.obtenerValorCelda(fila,columna) == 0):
+                    encerradas = self.fichasContrariasEncerradas(fila,columna)
+                    if (len(encerradas) > 0):
+                        movimientos.append((fila,columna))
+
+        return movimientos
+    
+    def colocarFicha(self,fila,columna,celdas):
+        """Colocar ficha del jugador activo en el tablero"""
+        self.modificarValorCelda(fila,columna,self.getJugadorActivo().getTurno())
+        self.aumentaCantidadFichasJugador(self.getJugadorActivo())
+        
+        #Capturar fichas enemigas
+        self.cambiarValorFichasEncerradas(celdas)
+
+        self.modificarCantidadFichasJugador(self.getJugadorActivo(), len(celdas))
+
+        #Turno del siguiente jugador
+        self.cambiarTurno(self.getJugadorActivo())
+    
+    def __copy__(self):
+        nuevoMotor = MotorDeJuego(self._jugador1,self._jugador2,np.copy(self._tablero),self._fichasNegras,self._fichasBlancas,self._posibleMovimientoJ1,self._posibleMovimientoJ2,self._tableroCompletado)
+        return nuevoMotor
