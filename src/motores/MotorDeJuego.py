@@ -11,7 +11,7 @@ from jugadores import IJugador
 @dataclass
 class MotorDeJuego ():
 
-    _tablero = np.zeros((8, 8))
+    #TODO: DARLE TIPO _tablero = np.zeros((8, 8))
 
     _jugador1: IJugador
     _jugador2: IJugador
@@ -29,6 +29,7 @@ class MotorDeJuego ():
             self._tablero = tablero
         else:
             # Inicializar un tablero
+            self._tablero = np.zeros((8, 8))
             self._inicializarTablero()
 
         self._jugador1 = jugador1
@@ -150,10 +151,18 @@ class MotorDeJuego ():
     def juega(self, interfaz: IInterfaz):
         """Inicia el juego (incluida la inicialización del tablero)"""
 
-        #TODO: BORRAR self._inicializarTablero(interfaz)
-
         while(True):
             interfaz.gestionEventos(self)
+    
+    def obtenerJugadorContario(self,jugador:int):
+        """Obtener jugador contrario"""
+        
+        if jugador == self._jugador1:
+            contrario = self._jugador2
+        else: 
+            contrario = self._jugador1
+
+        return contrario
     
     def obtenerValorContario(self,turno:int):
         """Obtener el valor de turno del contrario"""
@@ -165,6 +174,16 @@ class MotorDeJuego ():
 
         return contrario
 
+    def obtenerFichasJugador(self,jugador:IJugador) -> int:
+        """Devuelve la cantidad de fichas que tiene en el tablero el jugador indicado"""
+
+        if jugador.getColor == c.NEGRO:
+            fichas = self._fichasNegras
+        else: 
+            fichas = self._fichasBlancas
+
+        return fichas
+    
     def aumentaCantidadFichasJugador(self,jugadorActivo:IJugador):
         """Incrementa en 1 la cantidad de fichas de un jugador al colocar una ficha"""
 
@@ -182,10 +201,6 @@ class MotorDeJuego ():
         else: 
             self._fichasBlancas += cantidadFichas
             self._fichasNegras -= cantidadFichas
-        
-        #TODO: BORRAR
-        
-        print(self._fichasNegras,self._fichasBlancas)
 
     def fichasContrariasEncerradas(self,filaColocacion:int,columnaColocacion:int):
         """Determinar que celdas han sido encerradas tras la colocación y cambiar su valor"""
@@ -255,14 +270,10 @@ class MotorDeJuego ():
         """Recorrer el tablero buscando si hay posibles movimientos para el jugador activo"""
         posible = False
 
-        #Recorrer tablero comprobando cada celda
-        for fila in range(c.CELDAS):
-            for columna in range(c.CELDAS):
-                if (self.obtenerValorCelda(fila,columna) == 0):
-                    encerradas = self.fichasContrariasEncerradas(fila,columna)
-                    if (len(encerradas) > 0):
-                        posible = True
-                        break
+        movimientos = self.posiblesMovimientos()
+
+        if (len(movimientos) > 0):
+            posible = True
 
         #Almacenar información
         if self._jugadorActivo.getTurno() == c.P1:
