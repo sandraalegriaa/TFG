@@ -329,7 +329,20 @@ class MotorDeJuego ():
 
         #Turno del siguiente jugador
         self.cambiarTurno(self.getJugadorActivo())
-    
+
+    def obtenerEsquinasJugador(self,jugador:IJugador) -> int:
+        """Obtener la cantidad de fichas en esquinas que tiene el jugador indicado"""
+
+        color = jugador.getColor()
+        esquinas = 0
+
+        for esquina in c.ESQUINAS:
+            valor = self.obtenerValorCelda(*esquina) 
+            if (valor == color):
+                esquinas += 1
+        
+        return esquinas
+
     def __copy__(self):
         nuevoMotor = MotorDeJuego(self._jugador1,self._jugador2,np.copy(self._tablero),self._fichasNegras,self._fichasBlancas,self._posibleMovimientoJ1,self._posibleMovimientoJ2,self._tableroCompletado)
         return nuevoMotor

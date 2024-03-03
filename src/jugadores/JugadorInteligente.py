@@ -58,13 +58,12 @@ class JugadorInteligente():
         return puntuacion
     
     def evaluarEsquinas(self,motor:IMotorDeJuego,jugador:IJugador):
-        """Evalua el movimiento en función del número del número de movimientos posibles, cuantos más movimientos mejor"""
+        """Evalua el movimiento en función del número del número esquinas ocupadas con fichas del jugador, cuantos más esquinas mejor"""
 
         jugadorContrario = motor.obtenerJugadorContario(jugador)
 
-        #TODO:ARREGLAR
-        esquinasJugador = len(motor.posiblesMovimientosJugador(jugador))
-        esquinasContrario = len(motor.posiblesMovimientosJugador(jugadorContrario))
+        esquinasJugador = motor.obtenerEsquinasJugador(jugador)
+        esquinasContrario = motor.obtenerEsquinasJugador(jugadorContrario)
 
         if (esquinasJugador + esquinasContrario != 0):
             puntuacion = 100*(esquinasJugador-esquinasContrario)/(esquinasJugador+esquinasContrario)
@@ -73,12 +72,44 @@ class JugadorInteligente():
 
         return puntuacion
 
+    def evaluarCombinado(self, motor:IMotorDeJuego, jugador:IJugador):
+        """Evalúa combinando el número de fichas, la movilidad y las esquinas ocupadas,dando el mismo peso a cada evaluación."""
+
+        puntuacionFichas = self.evaluarFichas(motor, jugador)
+        puntuacionMovilidad = self.evaluarMovilidad(motor, jugador)
+        puntuacionEsquinas = self.evaluarEsquinas(motor, jugador)
+        
+        # Calcular la puntuación media
+        puntuacion = (puntuacionFichas + puntuacionMovilidad + puntuacionEsquinas) / 3
+        
+        return puntuacion
+    
+    def evaluarPesoCasillas(self, motor:IMotorDeJuego, jugador:IJugador):
+        """Calcula el valor de utilidad para un jugador basado en los pesos de cada casilla."""
+
+        jugadorContrario = motor.obtenerJugadorContario(jugador)
+        puntuacionJugador = 0
+        puntuacionContrario = 0
+        
+        # Sumar los pesos de las posiciones de las fichas de cada jugador
+        for fila in range(c.CELDAS):
+            for columna in range(c.CELDAS):
+                if motor.obtenerValorCelda(fila, columna) == jugador.getColor():
+                    puntuacionJugador += c.PESOS_TABLERO[fila][columna]
+                elif motor.obtenerValorCelda(fila, columna) == jugadorContrario.getColor():
+                    puntuacionContrario += c.PESOS_TABLERO[fila][columna]
+
+        # Calcular la puntuacion final
+        puntuacion = puntuacionJugador - puntuacionContrario
+        
+        return puntuacion
+
     def eligeMovimiento(self,motor:IMotorDeJuego):
         puntuacion, movimiento = self.minimax(motor,self,c.MAXIMA_PROFUNDIDAD_MINIMAX)
         return movimiento
 
     #Minimax
-    def minimax(self, motor, jugador, profundidad, alfa=float('-inf'), beta=float('inf')):
+    def minimax(self, motor:IMotorDeJuego, jugador: IJugador, profundidad:int, alfa=float('-inf'), beta=float('inf')):
     
         #Comprobar fin de la recursión
         if profundidad == 0 or motor.comprobarFinJuego():
@@ -88,6 +119,12 @@ class JugadorInteligente():
                 return self.evaluarFichas(motor,jugador), None
             elif (self.evaluador == c.EVALUADOR_MOVILIDAD):
                 return self.evaluarMovilidad(motor,jugador), None
+            elif (self.evaluador == c.EVALUADOR_ESQUINAS):
+                return self.evaluarEsquinas(motor,jugador), None
+            elif (self.evaluador == c.EVALUADOR_COMBINADO):
+                return self.evaluarCombinado(motor,jugador), None
+            elif (self.evaluador == c.EVALUADOR_PESOS):
+                return self.evaluarPesoCasillas(motor,jugador), None
                         
         #Incializar valores
         if motor.getJugadorActivo() == jugador:

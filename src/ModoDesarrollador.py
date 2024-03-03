@@ -34,6 +34,7 @@ def juegaUnaPartida(jugador1,jugador2,juego):
                     celdas = juego.fichasContrariasEncerradas(fila,columna)
 
                     #Realizar el movimiento
+                    print("MOVIMIENTO: ", i)
                     juego.colocarFicha(fila,columna,celdas)   
 
         ganador = juego.comprobarGanador()
@@ -52,8 +53,8 @@ def main():
     contadorBlancas = 0
     contadorEmpates = 0
 
-    jugador1 = JugadorInteligente(c.NEGRO,c.P1,c.EVALUADOR_MOVILIDAD)
-    jugador2 = JugadorInteligente(c.BLANCO,c.P2,c.EVALUADOR_RANDOM)
+    jugador1 = JugadorInteligente(c.NEGRO,c.P1,c.EVALUADOR_PESOS)
+    jugador2 = JugadorInteligente(c.BLANCO,c.P2,c.EVALUADOR_MOVILIDAD)
 
     for partida in range(c.PARTIDAS):  
 

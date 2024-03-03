@@ -11,7 +11,7 @@ class IJugador(Protocol):
         raise NotImplementedError()
     
     def getColor(self) -> str:
-        return self.color
+        raise NotImplementedError()
     
     def getTurno(self) -> int:
-        return self.turno
+        raise NotImplementedError()
