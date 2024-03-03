@@ -32,16 +32,46 @@ class JugadorInteligente():
 
         return random.randint(-100, 100)
     
-    def evaluarFichas(self,motor:IMotorDeJuego):
+    def evaluarFichas(self,motor:IMotorDeJuego,jugador:IJugador):
         """Evalua el movimiento en función del número de fichas de los jugadores, cuantas más fichas mejor"""
 
-        jugadorActivo = motor.getJugadorActivo()
-        jugadorContrario = motor.obtenerJugadorContario(jugadorActivo)
+        jugadorContrario = motor.obtenerJugadorContario(jugador)
 
-        fichasJugador = motor.obtenerFichasJugador(jugadorActivo)
+        fichasJugador = motor.obtenerFichasJugador(jugador)
         fichasContrario = motor.obtenerFichasJugador(jugadorContrario)
 
         return 100*(fichasJugador-fichasContrario)/(fichasJugador+fichasContrario)
+    
+    def evaluarMovilidad(self,motor:IMotorDeJuego,jugador:IJugador):
+        """Evalua el movimiento en función del número del número de movimientos posibles, cuantos más movimientos mejor"""
+
+        jugadorContrario = motor.obtenerJugadorContario(jugador)
+
+        movimientosJugador = len(motor.posiblesMovimientosJugador(jugador))
+        movimientosContrario = len(motor.posiblesMovimientosJugador(jugadorContrario))
+
+        if (movimientosJugador + movimientosContrario != 0):
+            puntuacion = 100*(movimientosJugador-movimientosContrario)/(movimientosJugador+movimientosContrario)
+        else:
+            puntuacion = 0
+
+        return puntuacion
+    
+    def evaluarEsquinas(self,motor:IMotorDeJuego,jugador:IJugador):
+        """Evalua el movimiento en función del número del número de movimientos posibles, cuantos más movimientos mejor"""
+
+        jugadorContrario = motor.obtenerJugadorContario(jugador)
+
+        #TODO:ARREGLAR
+        esquinasJugador = len(motor.posiblesMovimientosJugador(jugador))
+        esquinasContrario = len(motor.posiblesMovimientosJugador(jugadorContrario))
+
+        if (esquinasJugador + esquinasContrario != 0):
+            puntuacion = 100*(esquinasJugador-esquinasContrario)/(esquinasJugador+esquinasContrario)
+        else:
+            puntuacion = 0
+
+        return puntuacion
 
     def eligeMovimiento(self,motor:IMotorDeJuego):
         puntuacion, movimiento = self.minimax(motor,self,c.MAXIMA_PROFUNDIDAD_MINIMAX)
@@ -55,8 +85,10 @@ class JugadorInteligente():
             if (self.evaluador == c.EVALUADOR_RANDOM):
                 return self.evaluarRandom(motor), None
             elif (self.evaluador == c.EVALUADOR_FICHAS):
-                return self.evaluarFichas(motor), None
-            
+                return self.evaluarFichas(motor,jugador), None
+            elif (self.evaluador == c.EVALUADOR_MOVILIDAD):
+                return self.evaluarMovilidad(motor,jugador), None
+                        
         #Incializar valores
         if motor.getJugadorActivo() == jugador:
             mejorPuntuacion = float('-inf')
@@ -66,7 +98,8 @@ class JugadorInteligente():
         movimientos = motor.posiblesMovimientos()
 
         if (len(movimientos) > 0):
-            mejorMovimiento = movimientos[0]
+            pos = random.randint(0, len(movimientos)-1)
+            mejorMovimiento = movimientos[pos]
         else:
             mejorMovimiento = None
 

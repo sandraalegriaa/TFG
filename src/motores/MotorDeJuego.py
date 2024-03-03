@@ -202,13 +202,17 @@ class MotorDeJuego ():
             self._fichasBlancas += cantidadFichas
             self._fichasNegras -= cantidadFichas
 
-    def fichasContrariasEncerradas(self,filaColocacion:int,columnaColocacion:int):
+    def fichasContrariasEncerradas(self,filaColocacion:int,columnaColocacion:int,jugador: IJugador = None, contrario:IJugador = None):
         """Determinar que celdas han sido encerradas tras la colocación y cambiar su valor"""
         celdasEncerradas = []
         celdas = []
 
-        valorContrario = self.obtenerValorContario(self.getJugadorActivo().getTurno())
-        valorJugador = self.getJugadorActivo().getTurno()
+        if jugador is None and contrario is None:
+            valorContrario = self.obtenerValorContario(self.getJugadorActivo().getTurno())
+            valorJugador = self.getJugadorActivo().getTurno()
+        else: 
+            valorContrario = self.obtenerValorContario(jugador.getTurno())
+            valorJugador = jugador.getTurno()
 
         # Rectas
         # Arriba, Abajo, Izquierda, Derecha, DiagonalArribaIzquierda, DiagonalArribaDerecha, DiagonalAbajoIzquierda, DiagonalAbajoDerecha
@@ -292,6 +296,22 @@ class MotorDeJuego ():
             for columna in range(c.CELDAS):
                 if (self.obtenerValorCelda(fila,columna) == 0):
                     encerradas = self.fichasContrariasEncerradas(fila,columna)
+                    if (len(encerradas) > 0):
+                        movimientos.append((fila,columna))
+
+        return movimientos
+    
+    def posiblesMovimientosJugador(self,jugador:IJugador):
+        """Recorrer el tablero buscando los posibles movimientos para el jugador indicado"""
+        movimientos = []
+
+        contrario = self.obtenerJugadorContario(jugador.getTurno())
+        
+        #Recorrer tablero comprobando cada celda
+        for fila in range(c.CELDAS):
+            for columna in range(c.CELDAS):
+                if (self.obtenerValorCelda(fila,columna) == 0):
+                    encerradas = self.fichasContrariasEncerradas(fila,columna,jugador,contrario)
                     if (len(encerradas) > 0):
                         movimientos.append((fila,columna))
 
