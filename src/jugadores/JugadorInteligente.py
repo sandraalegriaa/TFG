@@ -30,7 +30,7 @@ class JugadorInteligente():
     def evaluarRandom(self,motor:IMotorDeJuego):
         """Evalua el movimiento de manera aleatoria"""
 
-        return random.randint(-100, 100)
+        return random.randint(c.MIN_PUNTUACION, c.MAX_PUNTUACION)
     
     def evaluarFichas(self,motor:IMotorDeJuego,jugador:IJugador):
         """Evalua el movimiento en función del número de fichas de los jugadores, cuantas más fichas mejor"""
@@ -40,7 +40,14 @@ class JugadorInteligente():
         fichasJugador = motor.obtenerFichasJugador(jugador)
         fichasContrario = motor.obtenerFichasJugador(jugadorContrario)
 
-        return 100*(fichasJugador-fichasContrario)/(fichasJugador+fichasContrario)
+        if (fichasJugador > fichasContrario):
+            puntuacion = c.MAX_PUNTUACION
+        elif (fichasJugador < fichasContrario):
+            puntuacion = c.MIN_PUNTUACION
+        else:
+            puntuacion = c.EMPATE_PUNTUACION
+
+        return puntuacion
     
     def evaluarMovilidad(self,motor:IMotorDeJuego,jugador:IJugador):
         """Evalua el movimiento en función del número del número de movimientos posibles, cuantos más movimientos mejor"""
@@ -75,12 +82,34 @@ class JugadorInteligente():
     def evaluarCombinado(self, motor:IMotorDeJuego, jugador:IJugador):
         """Evalúa combinando el número de fichas, la movilidad y las esquinas ocupadas,dando el mismo peso a cada evaluación."""
 
-        puntuacionFichas = self.evaluarFichas(motor, jugador)
-        puntuacionMovilidad = self.evaluarMovilidad(motor, jugador)
-        puntuacionEsquinas = self.evaluarEsquinas(motor, jugador)
+        #Comprobar porcentaje de la partida
+        fichasTablero = motor.getFichasTablero()
+        porcentaje = 100 * (fichasTablero/c.CASILLAS_TABLERO)
+
+        if porcentaje == 100:
+            puntuacion = self.evaluarFichas(motor, jugador)
+        else:
+            #Obtener puntuciones
+            puntuacionMovilidad = self.evaluarMovilidad(motor, jugador)
+            puntuacionEsquinas = self.evaluarEsquinas(motor, jugador)
+
+            #Calcular multiplicadores para los evaluadores
+            if (porcentaje >= c.PORCENTAJES_MOVILIDAD['min'] and porcentaje <= c.PORCENTAJES_MOVILIDAD['max']):
+                multiplicador =  c.VALOR_EVALUADOR_MOVILIDAD
+            else:
+                multiplicador = 100 - c.VALOR_EVALUADOR_MOVILIDAD
+
+            puntuacionMovilidad = puntuacionMovilidad * multiplicador
+
+            if (porcentaje > c.PORCENTAJES_ESQUINAS['min'] and porcentaje < c.PORCENTAJES_ESQUINAS['max']):
+                multiplicador =  c.VALOR_EVALUADOR_ESQUINAS
+            else:
+                multiplicador = 100 - c.VALOR_EVALUADOR_ESQUINAS
+
+            puntuacionEsquinas = puntuacionEsquinas * multiplicador
         
-        # Calcular la puntuación media
-        puntuacion = (puntuacionFichas + puntuacionMovilidad + puntuacionEsquinas) / 3
+            # Calcular la puntuación total
+            puntuacion = puntuacionMovilidad + puntuacionEsquinas
         
         return puntuacion
     

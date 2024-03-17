@@ -19,10 +19,12 @@ class MotorDeJuego ():
     _fichasNegras: int
     _fichasBlancas: int
 
+    _fichasTablero: int
+
     _posibleMovimientoJ1: bool
     _posibleMovimientoJ2: bool
 
-    def __init__(self, jugador1, jugador2, tablero=None, fichasNegras=None, fichasBlancas=None, puedeMoverJ1= None, puedeMoverJ2 = None,tableroCompletado = None, jugadorActivo = None):
+    def __init__(self, jugador1, jugador2, tablero=None, fichasNegras=None, fichasBlancas=None, fichasTablero=None, puedeMoverJ1= None, puedeMoverJ2 = None,tableroCompletado = None, jugadorActivo = None):
 
         if tablero is not None:
             # Usar tablero proporcionado
@@ -57,6 +59,14 @@ class MotorDeJuego ():
         else:
             #El tablero comienza con huecos disponibles
             self._tableroCompletado = False
+
+        #Incializar la cantidad de fichas del tablero según las reglas de inicialización
+        if fichasTablero is not None:
+            # Usar valor proporcionado
+            self._fichasTablero = fichasTablero
+        else:
+            # Inicializar valor
+            self._fichasTablero = 4
 
         #Inicializar la cantidad de fichas de cada jugador según las reglas de inicialización del tablero
         if fichasNegras is not None:
@@ -107,6 +117,10 @@ class MotorDeJuego ():
         """Cambiar el jugador activo en el motor de juego"""
 
         self._jugadorActivo = jugador
+
+    def getFichasTablero(self) -> int:
+        """Obtener la cantidad de fichas colocadas en el tablero"""
+        return self._fichasTablero
 
     def _inicializarTablero (self):
         """Iniciliza el tablero de juego siguiendo las reglas estándar"""
@@ -344,5 +358,5 @@ class MotorDeJuego ():
         return esquinas
 
     def __copy__(self):
-        nuevoMotor = MotorDeJuego(self._jugador1,self._jugador2,np.copy(self._tablero),self._fichasNegras,self._fichasBlancas,self._posibleMovimientoJ1,self._posibleMovimientoJ2,self._tableroCompletado)
+        nuevoMotor = MotorDeJuego(self._jugador1,self._jugador2,np.copy(self._tablero),self._fichasNegras,self._fichasBlancas,self._fichasTablero,self._posibleMovimientoJ1,self._posibleMovimientoJ2,self._tableroCompletado)
         return nuevoMotor

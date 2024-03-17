@@ -53,8 +53,8 @@ def main():
     contadorBlancas = 0
     contadorEmpates = 0
 
-    jugador1 = JugadorInteligente(c.NEGRO,c.P1,c.EVALUADOR_PESOS)
-    jugador2 = JugadorInteligente(c.BLANCO,c.P2,c.EVALUADOR_MOVILIDAD)
+    jugador1 = JugadorInteligente(c.NEGRO,c.P1,c.EVALUADOR_COMBINADO)
+    jugador2 = JugadorInteligente(c.BLANCO,c.P2,c.EVALUADOR_RANDOM)
 
     for partida in range(c.PARTIDAS):  
 

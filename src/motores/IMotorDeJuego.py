@@ -42,6 +42,9 @@ class IMotorDeJuego(Protocol):
             
     def setJugadorActivo(self,jugador: IJugador):
         raise NotImplementedError()
+    
+    def getFichasTablero(self) -> int:
+        raise NotImplementedError()
             
     def _inicializarTablero (self):
         raise NotImplementedError()
