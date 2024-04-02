@@ -356,6 +356,23 @@ class MotorDeJuego ():
                 esquinas += 1
         
         return esquinas
+    
+    def obtenerAdyacentesEsquinasJugador(self,jugador:IJugador) -> int:
+        """Obtener la cantidad de fichas adyacentes a esquinas vacías que tiene el jugador indicado"""
+
+        color = jugador.getColor()
+        adyacentes = 0
+        esquinas = c.ADYACENTES_ESQUINAS.keys()
+
+        for esquina in esquinas:
+            valor = self.obtenerValorCelda(*c.ESQUINAS_CODIGO[esquina]) 
+            if (valor != 0):
+                for adyacente in c.ADYACENTES_ESQUINAS[esquina]:
+                    valor = self.obtenerValorCelda(*adyacente)
+                    if (valor == color):
+                        adyacentes += 1
+
+        return adyacentes
 
     def __copy__(self):
         nuevoMotor = MotorDeJuego(self._jugador1,self._jugador2,np.copy(self._tablero),self._fichasNegras,self._fichasBlancas,self._fichasTablero,self._posibleMovimientoJ1,self._posibleMovimientoJ2,self._tableroCompletado)

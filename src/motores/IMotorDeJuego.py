@@ -105,4 +105,7 @@ class IMotorDeJuego(Protocol):
         
     def obtenerEsquinasJugador(self,jugador:IJugador) -> int:
         raise NotImplementedError()
+
+    def obtenerAdyacentesEsquinasJugador(self,jugador:IJugador) -> int:
+        raise NotImplementedError()
         
