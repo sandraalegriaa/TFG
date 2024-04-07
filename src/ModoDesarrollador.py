@@ -3,7 +3,6 @@ from os.path import dirname
 sys.path.append(dirname(__file__))
 
 import Constantes as c
-from motores import IMotorDeJuego
 from motores import MotorDeJuego
 from jugadores import JugadorInteligente
 

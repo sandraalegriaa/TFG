@@ -1,15 +1,15 @@
 import pygame as pg
-
+from typing import Optional
 import Constantes as c
 
 class Ficha(pg.sprite.Sprite):
     """Clase para representar una ficha como un sprite."""
 
     #Assets
-    _asset_blanca: pg.image = None
-    _asset_negra: pg.image = None
+    _asset_blanca: Optional[pg.Surface] = None
+    _asset_negra: Optional[pg.Surface] = None
 
-    def __init__(self, color: str, pos: tuple[int], pixelSupIzq: tuple[int]):
+    def __init__(self, color: str, pos: tuple[int,int], pixelSupIzq: tuple[int,int]):
 
         #Incializar el sprite
         super().__init__()
@@ -22,8 +22,9 @@ class Ficha(pg.sprite.Sprite):
         else:
             self.image = self._asset_negra
 
-        self.rect = self.image.get_rect()
-        self.rect.topleft = pixelSupIzq
+        if self.image is not None:
+            self.rect = self.image.get_rect()
+            self.rect.topleft = pixelSupIzq
 
     @classmethod
     def cargarImagenes(cls):

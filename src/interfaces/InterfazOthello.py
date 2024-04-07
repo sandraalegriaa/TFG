@@ -7,8 +7,8 @@ import math as m
 import tkinter as tk
 from tkinter import filedialog
 import os
-
-from motores import IMotorDeJuego
+from typing import Optional
+from motores import MotorDeJuego
 from Sprites import Ficha
 from Sprites import FichaSemiTransparente
 
@@ -22,30 +22,30 @@ class InterfazOthello ():
     _grupoSpritesFichasSemitransparente : pg.sprite.Group
     _nuevaFichasSemitransparente : pg.sprite.Group
 
-    _angituaFichaSemitransparente : tuple[int]
+    _angituaFichaSemitransparente : Optional[tuple[int,int]]
 
     #Assets
-    _asset_tablero: pg.image
-    _asset_fondo: pg.image
-    _asset_blanca_turno: pg.image
-    _asset_negra_turno: pg.image
-    _asset_blanca_movimiento: pg.image
-    _asset_negra_movimiento: pg.image
-    _asset_tapar_texto: pg.image
-    _asset_celda_oscura : pg.image
-    _asset_celda_clara : pg.image
-    _asset_guardar_partida: pg.image
+    _asset_tablero: pg.Surface
+    _asset_fondo: pg.Surface
+    _asset_blanca_turno: pg.Surface
+    _asset_negra_turno: pg.Surface
+    _asset_blanca_movimiento: pg.Surface
+    _asset_negra_movimiento: pg.Surface
+    _asset_tapar_texto: pg.Surface
+    _asset_celda_oscura : pg.Surface
+    _asset_celda_clara : pg.Surface
+    _asset_guardar_partida: pg.Surface
 
     #Botones
-    _assetBoton: pg.image
-    _assetBotonEncima: pg.image
+    _assetBoton: pg.Surface
+    _assetBotonEncima: pg.Surface
 
     _botonGuardar: pg.Rect
 
     #Fuentes
-    _fuenteTurno: pg.font
-    _fuenteMovimientos: pg.font
-    _fuenteBotones: pg.font
+    _fuenteTurno: pg.font.Font
+    _fuenteMovimientos: pg.font.Font
+    _fuenteBotones: pg.font.Font
 
     #Movimientos
     _inicioTextoMovimientosY: int
@@ -266,7 +266,7 @@ class InterfazOthello ():
                 pg.display.update()
 
 
-    def obtenerFichaJugador(self, motor : IMotorDeJuego):
+    def obtenerFichaJugador(self, motor : MotorDeJuego):
         """"Obtener asset de la ficha correspondiente al jugador activo"""
 
         jugadorActivo = motor.getJugadorActivo()
@@ -278,7 +278,7 @@ class InterfazOthello ():
     
         return colorFicha
     
-    def cambiarFichasEncerradas(self, motor: IMotorDeJuego, celdas):
+    def cambiarFichasEncerradas(self, motor: MotorDeJuego, celdas):
         """Cambiar sprite de las fichas encerradas por las fichas del jugador actual"""
 
         colorFicha = self.obtenerFichaJugador(motor)
@@ -390,9 +390,9 @@ class InterfazOthello ():
         self._ventana.blit(assetTurno, (c.LOCALIZACION_CENTRO_DERECHA-c.SEPARACION_FICHA_TEXTO+offset,self._inicioTextoMovimientosY))
         
         #Mostrar el movimiento realizado
-        columna = c.VALOR_COLUMNAS[str(columna)]
-        fila = c.VALOR_FILAS[str(fila)]
-        texto =  str(self._numeroMovimientos + 1) + ". " + columna + fila
+        textoColumna = c.VALOR_COLUMNAS[str(columna)]
+        textoFila = c.VALOR_FILAS[str(fila)]
+        texto =  str(self._numeroMovimientos + 1) + ". " + textoColumna + textoFila
         self.dibujarTextoEspaciadoMovimientos(texto,c.ESPACIADO_MOVIMIENTOS,c.MARRON_RGB,offset)
 
         #Incrementar valores necesarios
@@ -402,20 +402,20 @@ class InterfazOthello ():
         #Actualizar ventana
         pg.display.update()
 
-    def dibujaBoton(self,boton: pg.rect,asset: pg.image, texto: str): 
+    def dibujaBoton(self,boton: pg.Rect,asset: pg.Surface, texto: str): 
         """Crea el boton en la interfaz"""  
 
         self._ventana.blit(asset, boton.topleft)
         self.dibujarTextoEspaciadoBotones(texto,c.ESPACIADO_BOTONES,c.MARRON_RGB,boton.x,boton.y)
 
-    def posicionDentroDelTablero(self,pos:tuple[int]):
+    def posicionDentroDelTablero(self,pos:tuple[int,int]):
 
         x = pos[0]
         y = pos[1]
 
         return (x >= c.ORIGEN_TABLERO['x'] and x <= c.FIN_TABLERO['x']) and (y >= c.ORIGEN_TABLERO['y'] and y <= c.FIN_TABLERO['y'])
 
-    def finPartida(self,motor:IMotorDeJuego):
+    def finPartida(self,motor:MotorDeJuego):
 
         self._fin = True
 
@@ -483,7 +483,7 @@ class InterfazOthello ():
                     else:
                         print("No se seleccionó ninguna carpeta.") 
 
-    def gestionEventos(self, motor: IMotorDeJuego):
+    def gestionEventos(self, motor: MotorDeJuego):
         """Gestionar eventos en la interfaz"""
         if (self._fin):
             """Esperar a que el usuario cierre la ventana"""

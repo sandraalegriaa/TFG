@@ -5,28 +5,28 @@ import pygame as pg
 import sys
 import math as m
 
-from motores import IMotorDeJuego
+from motores import MotorDeJuego
 from motores import MotorDeJuego
 from interfaces import InterfazOthello
 from jugadores import JugadorHumano
-from jugadores import IJugador
+from jugadores import Jugador
 
 @dataclass
 class MenuPrincipal ():
 
-    _juego : IMotorDeJuego
+    _juego : MotorDeJuego
     _interfazOthello: InterfazOthello
-    _jugador1: IJugador
-    _jugador2: IJugador
+    _jugador1: Jugador
+    _jugador2: Jugador
 
-    _assetFondoMenu: pg.image
-    _assetBotonJugadorJugador: pg.image
-    _assetBotonJugadorIA: pg.image
-    _assetBotonJugadorJugadorEncima: pg.image
-    _assetBotonJugadorIAEncima: pg.image
+    _assetFondoMenu: pg.Surface
+    _assetBotonJugadorJugador: pg.Surface
+    _assetBotonJugadorIA: pg.Surface
+    _assetBotonJugadorJugadorEncima: pg.Surface
+    _assetBotonJugadorIAEncima: pg.Surface
 
-    _fuenteBotones: pg.font
-    _fuenteTitulo: pg.font
+    _fuenteBotones: pg.font.Font
+    _fuenteTitulo: pg.font.Font
 
     _cerrarVentana: bool
     
@@ -142,7 +142,7 @@ class MenuPrincipal ():
 
         return assetFondo, assetBotonJugadorJugador, assetBotonJugadorJugadorEncima, assetBotonJugadorIA, assetBotonJugadorIAEncima
     
-    def dibujaBoton(self,boton: pg.rect,asset: pg.image, texto: str): 
+    def dibujaBoton(self,boton: pg.Rect,asset: pg.Surface, texto: str): 
         """Crea el boton en la interfaz"""  
 
         self._ventana.blit(asset, boton.topleft)

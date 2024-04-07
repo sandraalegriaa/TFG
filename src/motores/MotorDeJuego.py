@@ -2,19 +2,19 @@ from dataclasses import dataclass, Field
 from typing import Protocol
 
 import numpy as np
+from typing import Optional
 
 import Constantes as c
 
-from interfaces import IInterfaz
-from jugadores import IJugador
-
+from jugadores import Jugador
+from interfaces import InterfazOthello
 @dataclass
 class MotorDeJuego ():
 
     #TODO: DARLE TIPO _tablero = np.zeros((8, 8))
 
-    _jugador1: IJugador
-    _jugador2: IJugador
+    _jugador1: Jugador
+    _jugador2: Jugador
 
     _fichasNegras: int
     _fichasBlancas: int
@@ -98,22 +98,22 @@ class MotorDeJuego ():
 
         return self._tablero
     
-    def getJugadorActivo(self) -> IJugador:
+    def getJugadorActivo(self) -> Jugador:
         """Devuelve el jugador activo del motor de juego"""
 
         return self._jugadorActivo
     
-    def getJugador1(self) -> IJugador:
+    def getJugador1(self) -> Jugador:
         """Devuelve el jugador1 del motor de juego"""
 
         return self._jugador1
     
-    def getJugador2(self) -> IJugador:
+    def getJugador2(self) -> Jugador:
         """Devuelve el jugador2 del motor de juego"""
 
         return self._jugador2
     
-    def setJugadorActivo(self,jugador: IJugador):
+    def setJugadorActivo(self,jugador: Jugador):
         """Cambiar el jugador activo en el motor de juego"""
 
         self._jugadorActivo = jugador
@@ -133,7 +133,7 @@ class MotorDeJuego ():
         self._tablero[4][c.D] = 1
         self._tablero[3][c.E] = 1
 
-    def obtenerValorCelda(self, fila:int, columna:int):
+    def obtenerValorCelda(self, fila:int, columna:int) -> Optional[int]:
         """Obtener el valor de una celda en el tablero"""
         
         if (self.dentroCeldas(fila,columna)):
@@ -152,7 +152,7 @@ class MotorDeJuego ():
 
         return fila in range(0,8) and columna in range(0,8)
     
-    def cambiarTurno(self, jugadorActual: IJugador):
+    def cambiarTurno(self, jugadorActual: Jugador):
         """Cambiar el jugador activo dando el turno al siguiente jugador"""
 
         if jugadorActual.getTurno() == c.P1:
@@ -162,13 +162,13 @@ class MotorDeJuego ():
             self.setJugadorActivo(self._jugador1)
             #print("Cambio de turno a jugador 1")      
     
-    def juega(self, interfaz: IInterfaz):
+    def juega(self, interfaz: InterfazOthello):
         """Inicia el juego (incluida la inicialización del tablero)"""
 
         while(True):
             interfaz.gestionEventos(self)
     
-    def obtenerJugadorContario(self,jugador:int):
+    def obtenerJugadorContario(self,jugador:Jugador):
         """Obtener jugador contrario"""
         
         if jugador == self._jugador1:
@@ -188,7 +188,7 @@ class MotorDeJuego ():
 
         return contrario
 
-    def obtenerFichasJugador(self,jugador:IJugador) -> int:
+    def obtenerFichasJugador(self,jugador:Jugador) -> int:
         """Devuelve la cantidad de fichas que tiene en el tablero el jugador indicado"""
 
         if jugador.getColor == c.NEGRO:
@@ -198,7 +198,7 @@ class MotorDeJuego ():
 
         return fichas
     
-    def aumentaCantidadFichasJugador(self,jugadorActivo:IJugador):
+    def aumentaCantidadFichasJugador(self,jugadorActivo:Jugador):
         """Incrementa en 1 la cantidad de fichas de un jugador al colocar una ficha"""
 
         if jugadorActivo.getTurno() == c.P1:
@@ -206,7 +206,7 @@ class MotorDeJuego ():
         else: 
             self._fichasBlancas += 1
 
-    def modificarCantidadFichasJugador(self, jugadorActivo: IJugador, cantidadFichas: int):
+    def modificarCantidadFichasJugador(self, jugadorActivo: Jugador, cantidadFichas: int):
         """Modifica la cantidad de fichas de un jugador al encerrar fichas de su oponente"""
 
         if jugadorActivo.getTurno() == c.P1:
@@ -216,7 +216,7 @@ class MotorDeJuego ():
             self._fichasBlancas += cantidadFichas
             self._fichasNegras -= cantidadFichas
 
-    def fichasContrariasEncerradas(self,filaColocacion:int,columnaColocacion:int,jugador: IJugador = None, contrario:IJugador = None):
+    def fichasContrariasEncerradas(self,filaColocacion:int,columnaColocacion:int,jugador: Optional[Jugador] = None, contrario: Optional[Jugador] = None):
         """Determinar que celdas han sido encerradas tras la colocación y cambiar su valor"""
         celdasEncerradas = []
         celdas = []
@@ -225,8 +225,9 @@ class MotorDeJuego ():
             valorContrario = self.obtenerValorContario(self.getJugadorActivo().getTurno())
             valorJugador = self.getJugadorActivo().getTurno()
         else: 
-            valorContrario = self.obtenerValorContario(jugador.getTurno())
-            valorJugador = jugador.getTurno()
+            if jugador is not None:
+                valorContrario = self.obtenerValorContario(jugador.getTurno())
+                valorJugador = jugador.getTurno()
 
         # Rectas
         # Arriba, Abajo, Izquierda, Derecha, DiagonalArribaIzquierda, DiagonalArribaDerecha, DiagonalAbajoIzquierda, DiagonalAbajoDerecha
@@ -254,7 +255,8 @@ class MotorDeJuego ():
         for celda in celdas:
             fila, columna = celda[0], celda[1]
             valor = self.obtenerValorCelda(fila,columna)
-            self.modificarValorCelda(fila,columna,self.obtenerValorContario(valor))
+            if valor is not None:
+                self.modificarValorCelda(fila,columna,self.obtenerValorContario(valor))
 
     def comprobarFinJuego(self):
         """Comprobar si el juego se ha acabado porque:
@@ -315,11 +317,11 @@ class MotorDeJuego ():
 
         return movimientos
     
-    def posiblesMovimientosJugador(self,jugador:IJugador):
+    def posiblesMovimientosJugador(self,jugador:Jugador):
         """Recorrer el tablero buscando los posibles movimientos para el jugador indicado"""
         movimientos = []
 
-        contrario = self.obtenerJugadorContario(jugador.getTurno())
+        contrario = self.obtenerJugadorContario(jugador)
         
         #Recorrer tablero comprobando cada celda
         for fila in range(c.CELDAS):
@@ -344,7 +346,7 @@ class MotorDeJuego ():
         #Turno del siguiente jugador
         self.cambiarTurno(self.getJugadorActivo())
 
-    def obtenerEsquinasJugador(self,jugador:IJugador) -> int:
+    def obtenerEsquinasJugador(self,jugador:Jugador) -> int:
         """Obtener la cantidad de fichas en esquinas que tiene el jugador indicado"""
 
         color = jugador.getColor()
@@ -357,7 +359,7 @@ class MotorDeJuego ():
         
         return esquinas
     
-    def obtenerAdyacentesEsquinasJugador(self,jugador:IJugador) -> int:
+    def obtenerAdyacentesEsquinasJugador(self,jugador:Jugador) -> int:
         """Obtener la cantidad de fichas adyacentes a esquinas vacías que tiene el jugador indicado"""
 
         color = jugador.getColor()

@@ -1,17 +1,11 @@
 from dataclasses import dataclass
+from jugadores.Jugador import Jugador
 
 @dataclass
-class JugadorHumano():
+class JugadorHumano(Jugador):
     """Clase del jugador humano"""
 
     def __init__(self, color, turno):
-        self.color = color
-        self.turno = turno
-
-    def getColor(self) -> str:
-        return self.color
-    
-    def getTurno(self) -> int:
-        return self.turno
+        super().__init__(color,turno)
 
     

@@ -132,10 +132,13 @@ PESOS_TABLERO = [
     [ 100, -75, 50,  50,  50,  50, -75,  100]
 ]
 
-MAXIMA_PROFUNDIDAD_MINIMAX = 8
+MAXIMA_PROFUNDIDAD_MINIMAX = 5
 
 #Valores evaluador random
 MIN_PUNTUACION = -100
 MAX_PUNTUACION = 100
 EMPATE = 0
+
+#Tablas de trasposición
+MAX_BUCKETS = 65
 
