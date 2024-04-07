@@ -20,7 +20,7 @@ class EntradaTabla ():
     _tipoPuntuacion: TipoPuntuacion
 
     #Mejor movimiento a realizar (cálculo previo)
-    _mejorMovimiento: tuple[int]
+    _mejorMovimiento: tuple[int,int]
 
     #Profundidad en la cual fue encontrada la puntuación
     _profundidad: int
@@ -42,7 +42,7 @@ class EntradaTabla ():
     def getTipoPuntuacion(self) -> TipoPuntuacion:
         return self._tipoPuntuacion
     
-    def getMejorMovimiento(self) -> tuple[int]:
+    def getMejorMovimiento(self) -> tuple[int,int]:
         return self._mejorMovimiento
     
     def getProfundidad(self) -> int:

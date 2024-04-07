@@ -1,18 +1,14 @@
-from dataclasses import dataclass
-from EntradaTabla import EntradaTabla
+from dataclasses import dataclass, field
+from .EntradaTabla import EntradaTabla
 from typing import Optional
-
+import numpy as np
 @dataclass
 class TablaTrasposicion ():
 
     _tamTabla = 64
-    _entradas: list[Optional[EntradaTabla]] = [None] * _tamTabla
+    _entradas: list[Optional[EntradaTabla]] = field(default_factory=lambda: [None] * 64)
 
-    def __init__(self,entradas):
-        
-        self._entradas = entradas
-
-    def obtenerEntrada(self,valorHash:int) -> Optional[EntradaTabla]:
+    def obtenerEntrada(self,valorHash) -> Optional[EntradaTabla]:
         """Devuelve una entrada de la tabla"""
 
         entrada = self._entradas[valorHash % self._tamTabla]

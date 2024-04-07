@@ -7,7 +7,7 @@ from motores import MotorDeJuego
 from jugadores import JugadorInteligente
 
 
-def juegaUnaPartida(jugador1,jugador2,juego):
+def juegaUnaPartida(jugador1:JugadorInteligente,jugador2:JugadorInteligente,juego: MotorDeJuego):
         i = 0
 
         while (not juego.comprobarFinJuego()):
@@ -21,9 +21,9 @@ def juegaUnaPartida(jugador1,jugador2,juego):
             else:
 
                 if (juego.getJugadorActivo() == jugador1):
-                    movimiento = jugador1.eligeMovimiento(juego)
+                    movimiento = jugador1.eligeMovimientoTablaTrasposicion(juego)
                 else:
-                    movimiento = jugador2.eligeMovimiento(juego)
+                    movimiento = jugador2.eligeMovimientoTablaTrasposicion(juego)
 
                 if movimiento is not None:
                     fila = movimiento[0]
@@ -70,8 +70,8 @@ def main():
         else:
             contadorEmpates += 1
     
-    print("NEGRAS;BLANCAS;EMPATES")
-    print(contadorNegras,contadorBlancas,contadorEmpates)
+        print("NEGRAS;BLANCAS;EMPATES")
+        print(contadorNegras,contadorBlancas,contadorEmpates)
 
 if __name__ == "__main__":
     main()

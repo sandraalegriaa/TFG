@@ -1,23 +1,29 @@
 from dataclasses import dataclass
 from motores import MotorDeJuego
 from jugadores.Jugador import Jugador
-
+from typing import Optional
 import Constantes as c
 import random
+from tablasTrasposicion import EntradaTabla
+from tablasTrasposicion import TipoPuntuacion
+from tablasTrasposicion import TablaTrasposicion
 
 
 @dataclass
 class JugadorInteligente(Jugador):
     """Clase del jugador humano"""
 
-    evaluador : int
+    _evaluador : int
+
+    _tablaTrasposicion: TablaTrasposicion
 
     def __init__(self, color, turno,evaluador):
         super().__init__(color,turno)
-        self.evaluador = evaluador
+        self._evaluador = evaluador
+        self._tablaTrasposicion = TablaTrasposicion()
 
     def cambiarEvaluador(self, evaluador:int):
-        self.evaluador = evaluador
+        self._evaluador = evaluador
 
     #Funciones de evaluación
     def evaluarRandom(self,motor:MotorDeJuego):
@@ -128,17 +134,17 @@ class JugadorInteligente(Jugador):
     
         #Comprobar fin de la recursión
         if profundidad == 0 or motor.comprobarFinJuego():
-            if (self.evaluador == c.EVALUADOR_RANDOM):
+            if (self._evaluador == c.EVALUADOR_RANDOM):
                 return self.evaluarRandom(motor), None
-            elif (self.evaluador == c.EVALUADOR_FICHAS):
+            elif (self._evaluador == c.EVALUADOR_FICHAS):
                 return self.evaluarFichas(motor,jugador), None
-            elif (self.evaluador == c.EVALUADOR_MOVILIDAD):
+            elif (self._evaluador == c.EVALUADOR_MOVILIDAD):
                 return self.evaluarMovilidad(motor,jugador), None
-            elif (self.evaluador == c.EVALUADOR_ESQUINAS):
+            elif (self._evaluador == c.EVALUADOR_ESQUINAS):
                 return self.evaluarEsquinas(motor,jugador), None
-            elif (self.evaluador == c.EVALUADOR_COMBINADO):
+            elif (self._evaluador == c.EVALUADOR_COMBINADO):
                 return self.evaluarCombinado(motor,jugador), None
-            elif (self.evaluador == c.EVALUADOR_PESOS):
+            elif (self._evaluador == c.EVALUADOR_PESOS):
                 return self.evaluarPesoCasillas(motor,jugador), None
                         
         #Incializar valores
@@ -188,14 +194,37 @@ class JugadorInteligente(Jugador):
         #Devolver valores obtenidos
         return mejorPuntuacion, mejorMovimiento
     
+    def eligeMovimientoTablaTrasposicion(self,motor:MotorDeJuego):
+        
+        puntuacion, movimiento = self.minimaxTablaTrasposicion(motor,self,c.MAXIMA_PROFUNDIDAD_MINIMAX)
+        return movimiento
+    
     #Minimax con tabla de trasposicion
     def minimaxTablaTrasposicion(self, motor:MotorDeJuego, jugador: Jugador, profundidad:int, alfa=float('-inf'), beta=float('inf')):
-    
+
+        #Obtener valor hash del estado actual del tablero
+        valorHash = motor.hash()
+
+        #Obtener entrada de la tabla
+        entrada = self._tablaTrasposicion.obtenerEntrada(valorHash)
+
+        #Comprobar que halla entrada en la tabla y su profundidad
+        if entrada and entrada.getProfundidad() >= profundidad:
+            # Usamos la puntuación almacenada si es aplicable, dependiendo de la lógica de tu juego y del tipo de puntuación
+            if entrada.getTipoPuntuacion() == TipoPuntuacion.PRECISA:
+                return entrada.getPuntuacion(), entrada.getMejorMovimiento()
+            elif entrada.getTipoPuntuacion() == TipoPuntuacion.FALLO_ALTO and entrada.getPuntuacion() < beta:
+                beta = entrada.getPuntuacion()
+            elif entrada.getTipoPuntuacion() == TipoPuntuacion.FALLO_BAJO and entrada.getPuntuacion() > alfa:
+                alfa = entrada.getPuntuacion()
+            if alfa >= beta:
+                return entrada.getPuntuacion(), entrada.getMejorMovimiento()
+        
         #Comprobar fin de la recursión
         if profundidad == 0 or motor.comprobarFinJuego():
-            if (self.evaluador == c.EVALUADOR_RANDOM):
+            if (self._evaluador == c.EVALUADOR_RANDOM):
                 return self.evaluarRandom(motor), None
-            elif (self.evaluador == c.EVALUADOR_COMBINADO):
+            elif (self._evaluador == c.EVALUADOR_COMBINADO):
                 return self.evaluarCombinado(motor,jugador), None
                         
         #Incializar valores
@@ -212,6 +241,8 @@ class JugadorInteligente(Jugador):
         else:
             mejorMovimiento = None
 
+        tipoPuntuacion = TipoPuntuacion.PRECISA
+
         for movimiento in movimientos:
             #Obtener fila,columna del movimiento
             fila, columna = movimiento[0], movimiento[1]
@@ -224,7 +255,7 @@ class JugadorInteligente(Jugador):
             nuevoMotor.colocarFicha(fila, columna, celdas)
 
             #Aplicar recursión
-            puntuacion, _ = self.minimax(nuevoMotor, jugador, profundidad - 1, alfa, beta)
+            puntuacion, _ = self.minimaxTablaTrasposicion(nuevoMotor, jugador, profundidad - 1, alfa, beta)
 
             #Actualizar valores
             if motor.getJugadorActivo() == jugador:
@@ -233,6 +264,7 @@ class JugadorInteligente(Jugador):
                     mejorMovimiento = movimiento
                 beta = min(beta, puntuacion)
                 if beta <= alfa:
+                    tipoPuntuacion = TipoPuntuacion.FALLO_ALTO
                     break  # Poda alfa-beta
             else:
                 if puntuacion < mejorPuntuacion:
@@ -240,7 +272,12 @@ class JugadorInteligente(Jugador):
                     mejorMovimiento = movimiento
                 alfa = max(alfa, puntuacion)
                 if alfa >= beta:
+                    tipoPuntuacion = TipoPuntuacion.FALLO_BAJO
                     break  # Poda alfa-beta
+
+        # Almacenar nueva puntuación y mejor movimiento en la tabla de trasposición
+        nuevaEntrada = EntradaTabla(valorHash, mejorPuntuacion, tipoPuntuacion, mejorMovimiento, profundidad)
+        self._tablaTrasposicion.almacenarEntrada(nuevaEntrada)
 
         #Devolver valores obtenidos
         return mejorPuntuacion, mejorMovimiento

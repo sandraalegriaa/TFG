@@ -113,7 +113,7 @@ ESQUINAS_CODIGO = {'00': (0,A), '70': (7,A), '07': (0,H), '77': (7,H)}
 ADYACENTES_ESQUINAS = {'00': [(0,B),(1,A)], '70': [(6,A),(7,B)], '07': [(0,G),(1,H)], '77': [(7,G),(6,H)]}
 
 #Inteligencia Artificial
-PARTIDAS = 10
+PARTIDAS = 30
 EVALUADOR_RANDOM = 0
 EVALUADOR_FICHAS = 1
 EVALUADOR_MOVILIDAD = 2
@@ -132,13 +132,11 @@ PESOS_TABLERO = [
     [ 100, -75, 50,  50,  50,  50, -75,  100]
 ]
 
-MAXIMA_PROFUNDIDAD_MINIMAX = 5
+MAXIMA_PROFUNDIDAD_MINIMAX = 8
 
 #Valores evaluador random
 MIN_PUNTUACION = -100
 MAX_PUNTUACION = 100
 EMPATE = 0
 
-#Tablas de trasposición
-MAX_BUCKETS = 65
 

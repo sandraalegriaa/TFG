@@ -1,17 +1,14 @@
-from dataclasses import dataclass, Field
+from dataclasses import dataclass, field
 from typing import Protocol
-
+import random
 import numpy as np
 from typing import Optional
 
 import Constantes as c
-
 from jugadores import Jugador
 from interfaces import InterfazOthello
 @dataclass
 class MotorDeJuego ():
-
-    #TODO: DARLE TIPO _tablero = np.zeros((8, 8))
 
     _jugador1: Jugador
     _jugador2: Jugador
@@ -23,6 +20,8 @@ class MotorDeJuego ():
 
     _posibleMovimientoJ1: bool
     _posibleMovimientoJ2: bool
+
+    #_zobristKey: list[int] 
 
     def __init__(self, jugador1, jugador2, tablero=None, fichasNegras=None, fichasBlancas=None, fichasTablero=None, puedeMoverJ1= None, puedeMoverJ2 = None,tableroCompletado = None, jugadorActivo = None):
 
@@ -92,6 +91,11 @@ class MotorDeJuego ():
                 self._jugadorActivo = self._jugador1
             else: 
                 self._jugadorActivo = self._jugador2
+
+        #Inicializar zobristkeys
+        self._zobristKey = np.zeros(64*2, dtype=np.int32)
+
+        self.inicializarZobristKey()
 
     def getTablero(self) -> np.ndarray:
         """Devuelve el tablero de juego del motor de juego"""
@@ -377,5 +381,27 @@ class MotorDeJuego ():
         return adyacentes
 
     def __copy__(self):
+        """Devuelve una copia del motor de juego"""
+        
         nuevoMotor = MotorDeJuego(self._jugador1,self._jugador2,np.copy(self._tablero),self._fichasNegras,self._fichasBlancas,self._fichasTablero,self._posibleMovimientoJ1,self._posibleMovimientoJ2,self._tableroCompletado)
         return nuevoMotor
+
+    def inicializarZobristKey(self):
+        """Inicializa la zobrist key a números enteros aleatorios"""
+
+        for i in range(c.CELDAS*c.CELDAS*2):
+            self._zobristKey[i] = np.random.randint(low=0, high=np.iinfo(np.int32).max, dtype=np.int32)
+
+    def hash(self):
+        """Función hash"""
+
+        resultado = 0
+
+        for fila in range(c.CELDAS):
+            for columna in range(c.CELDAS):
+                ficha = self.obtenerValorCelda(fila,columna)
+                if ficha is not None and ficha != 0:
+                    indice = (fila+columna) * 2 + (ficha-1) 
+                    resultado = np.int32(resultado) ^ np.int32(self._zobristKey[int(indice)])
+
+        return resultado

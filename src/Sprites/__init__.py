@@ -1,2 +1,2 @@
-from .Ficha import  Ficha
-from .FichaSemiTransparente import  FichaSemiTransparente
+from .Ficha import Ficha
+from .FichaSemiTransparente import FichaSemiTransparente
