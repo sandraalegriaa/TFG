@@ -23,7 +23,7 @@ class MotorDeJuego ():
 
     #_zobristKey: list[int] 
 
-    def __init__(self, jugador1, jugador2, tablero=None, fichasNegras=None, fichasBlancas=None, fichasTablero=None, puedeMoverJ1= None, puedeMoverJ2 = None,tableroCompletado = None, jugadorActivo = None):
+    def __init__(self, jugador1, jugador2, tablero=None, fichasNegras=None, fichasBlancas=None, fichasTablero=None, puedeMoverJ1= None, puedeMoverJ2 = None,tableroCompletado = None, jugadorActivo = None, zobristKey = None):
 
         if tablero is not None:
             # Usar tablero proporcionado
@@ -91,11 +91,14 @@ class MotorDeJuego ():
                 self._jugadorActivo = self._jugador1
             else: 
                 self._jugadorActivo = self._jugador2
-
-        #Inicializar zobristkeys
-        self._zobristKey = np.zeros(64*2, dtype=np.int32)
-
-        self.inicializarZobristKey()
+        
+        if zobristKey is not None:
+            # Usar valor proporcionado
+            self._zobristKey = zobristKey
+        else:
+            #Inicializar zobristkeys
+            self._zobristKey = np.zeros(64*2, dtype=np.int32)
+            self.inicializarZobristKey()
 
     def getTablero(self) -> np.ndarray:
         """Devuelve el tablero de juego del motor de juego"""
@@ -383,7 +386,7 @@ class MotorDeJuego ():
     def __copy__(self):
         """Devuelve una copia del motor de juego"""
         
-        nuevoMotor = MotorDeJuego(self._jugador1,self._jugador2,np.copy(self._tablero),self._fichasNegras,self._fichasBlancas,self._fichasTablero,self._posibleMovimientoJ1,self._posibleMovimientoJ2,self._tableroCompletado)
+        nuevoMotor = MotorDeJuego(self._jugador1,self._jugador2,np.copy(self._tablero),self._fichasNegras,self._fichasBlancas,self._fichasTablero,self._posibleMovimientoJ1,self._posibleMovimientoJ2,self._tableroCompletado,self._jugadorActivo,self._zobristKey)
         return nuevoMotor
 
     def inicializarZobristKey(self):
