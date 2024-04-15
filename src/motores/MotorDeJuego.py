@@ -404,7 +404,7 @@ class MotorDeJuego ():
             for columna in range(c.CELDAS):
                 ficha = self.obtenerValorCelda(fila,columna)
                 if ficha is not None and ficha != 0:
-                    indice = (fila+columna) * 2 + (ficha-1) 
+                    indice = (fila*c.CELDAS+columna) * 2 + (ficha-1) 
                     resultado = np.int32(resultado) ^ np.int32(self._zobristKey[int(indice)])
 
         return resultado

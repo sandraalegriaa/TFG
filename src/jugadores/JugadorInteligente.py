@@ -82,7 +82,7 @@ class JugadorInteligente(Jugador):
         return puntuacion
     
     def evaluarAdyacentes(self,motor:MotorDeJuego,jugador:Jugador):
-        """Evalua el movimiento en función del número de fuchas adyacentes a esquinas vacías, cuantas más peor"""
+        """Evalua el movimiento en función del número de fichas adyacentes a esquinas vacías, cuantas más peor"""
 
         jugadorContrario = motor.obtenerJugadorContario(jugador)
 
@@ -210,14 +210,17 @@ class JugadorInteligente(Jugador):
 
         #Comprobar que halla entrada en la tabla y su profundidad
         if entrada and entrada.getProfundidad() >= profundidad:
-            # Usamos la puntuación almacenada si es aplicable, dependiendo de la lógica de tu juego y del tipo de puntuación
+            # Usar la puntuación almacenada
             if entrada.getTipoPuntuacion() == TipoPuntuacion.PRECISA:
                 return entrada.getPuntuacion(), entrada.getMejorMovimiento()
             elif entrada.getTipoPuntuacion() == TipoPuntuacion.FALLO_ALTO and entrada.getPuntuacion() < beta:
+                #Actualizar beta
                 beta = entrada.getPuntuacion()
             elif entrada.getTipoPuntuacion() == TipoPuntuacion.FALLO_BAJO and entrada.getPuntuacion() > alfa:
+                #Actualizar alfa
                 alfa = entrada.getPuntuacion()
             if alfa >= beta:
+                #Podar rama del árbol
                 return entrada.getPuntuacion(), entrada.getMejorMovimiento()
         
         #Comprobar fin de la recursión
@@ -240,6 +243,7 @@ class JugadorInteligente(Jugador):
             mejorMovimiento = movimientos[pos]
         else:
             mejorMovimiento = None
+            return mejorPuntuacion, mejorMovimiento
 
         tipoPuntuacion = TipoPuntuacion.PRECISA
 

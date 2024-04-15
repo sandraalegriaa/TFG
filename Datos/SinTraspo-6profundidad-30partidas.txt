@@ -1,0 +1,3 @@
+Partida:29
+NEGRAS;BLANCAS;EMPATES: 24;6;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 2.06 segundos, Jugador 2: 0.24 segundos

@@ -5,8 +5,8 @@ import numpy as np
 @dataclass
 class TablaTrasposicion ():
 
-    _tamTabla = 64
-    _entradas: list[Optional[EntradaTabla]] = field(default_factory=lambda: [None] * 64)
+    _tamTabla = 128
+    _entradas: list[Optional[EntradaTabla]] = field(default_factory=lambda: [None] * 128)
 
     def obtenerEntrada(self,valorHash) -> Optional[EntradaTabla]:
         """Devuelve una entrada de la tabla"""
