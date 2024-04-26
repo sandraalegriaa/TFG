@@ -15,6 +15,9 @@ from Sprites import FichaSemiTransparente
 @dataclass
 class InterfazOthello ():
 
+    #Motor
+    _motor : MotorDeJuego
+
     #Sprites
     _grupoSpritesFichas : pg.sprite.Group
     _nuevaFicha: pg.sprite.Group
@@ -55,7 +58,9 @@ class InterfazOthello ():
 
     _fin: bool
 
-    def __init__(self):
+    def __init__(self, motor):
+
+        self._motor = motor
 
         #Iniciar pygame
         pg.init()
@@ -266,10 +271,10 @@ class InterfazOthello ():
                 pg.display.update()
 
 
-    def obtenerFichaJugador(self, motor : MotorDeJuego):
+    def obtenerFichaJugador(self):
         """"Obtener asset de la ficha correspondiente al jugador activo"""
 
-        jugadorActivo = motor.getJugadorActivo()
+        jugadorActivo = self._motor.getJugadorActivo()
 
         if (jugadorActivo.getColor() == c.NEGRO):
             colorFicha = c.FICHA_NEGRA
@@ -278,10 +283,10 @@ class InterfazOthello ():
     
         return colorFicha
     
-    def cambiarFichasEncerradas(self, motor: MotorDeJuego, celdas):
+    def cambiarFichasEncerradas(self, celdas):
         """Cambiar sprite de las fichas encerradas por las fichas del jugador actual"""
 
-        colorFicha = self.obtenerFichaJugador(motor)
+        colorFicha = self.obtenerFichaJugador()
 
         for [fila,columna] in celdas:
             self.colocarFicha(colorFicha,fila,columna)
@@ -415,11 +420,11 @@ class InterfazOthello ():
 
         return (x >= c.ORIGEN_TABLERO['x'] and x <= c.FIN_TABLERO['x']) and (y >= c.ORIGEN_TABLERO['y'] and y <= c.FIN_TABLERO['y'])
 
-    def finPartida(self,motor:MotorDeJuego):
+    def finPartida(self):
 
         self._fin = True
 
-        ganador = motor.comprobarGanador()
+        ganador = self._motor.comprobarGanador()
         
         if (ganador == c.EMPATE_ENTRE_JUGADORES):
             #Empate entre jugadores
@@ -483,7 +488,7 @@ class InterfazOthello ():
                     else:
                         print("No se seleccionó ninguna carpeta.") 
 
-    def gestionEventos(self, motor: MotorDeJuego):
+    def gestionEventos(self):
         """Gestionar eventos en la interfaz"""
         if (self._fin):
             """Esperar a que el usuario cierre la ventana"""
@@ -508,27 +513,27 @@ class InterfazOthello ():
 
                 fila, columna = self.obtenerCelda(pos)
 
-            if(motor.dentroCeldas(fila,columna) and motor.obtenerValorCelda(fila,columna) == 0):
+            if(self._motor.dentroCeldas(fila,columna) and self._motor.obtenerValorCelda(fila,columna) == 0):
                 if (self._angituaFichaSemitransparente != (fila,columna)):
                     #Colocar ficha del jugador en la interfaz
-                    colorFicha = self.obtenerFichaJugador(motor)
+                    colorFicha = self.obtenerFichaJugador()
                     self.colocarFichaSemitransparente(colorFicha,fila,columna)
 
                     #Eliminar antigua ficha semitransparente colocada
-                    if (self._angituaFichaSemitransparente != None and motor.obtenerValorCelda(self._angituaFichaSemitransparente[0],self._angituaFichaSemitransparente[1]) == 0):
+                    if (self._angituaFichaSemitransparente != None and self._motor.obtenerValorCelda(self._angituaFichaSemitransparente[0],self._angituaFichaSemitransparente[1]) == 0):
                         self.eliminarFichaSemitrasparente(self._angituaFichaSemitransparente[0], self._angituaFichaSemitransparente[1])
 
                     self._angituaFichaSemitransparente = (fila,columna)
 
-            if (not motor.comprobarPosiblesMovimientos()):
+            if (not self._motor.comprobarPosiblesMovimientos()):
                 print("NO PUEDE COLOCAR, CAMBIAR TURNO AL SIGUIENTE")
 
                 #Cambiar el turno al siguiente jugador
-                motor.cambiarTurno(motor.getJugadorActivo())
-                self.indicarCambioDeTurno(motor.getJugadorActivo().getTurno())
+                self._motor.cambiarTurno(self._motor.getJugadorActivo())
+                self.indicarCambioDeTurno(self._motor.getJugadorActivo().getTurno())
 
-            if (motor.comprobarFinJuego()):
-                self.finPartida(motor)
+            if (self._motor.comprobarFinJuego()):
+                self.finPartida()
 
             for event in pg.event.get():
                 #Cerrar ventana
@@ -545,35 +550,41 @@ class InterfazOthello ():
                         print(pos)
                         print()
                         #Colocacion de las fichas
-                        if (motor.dentroCeldas(fila,columna) and motor.obtenerValorCelda(fila,columna) == 0):
+                        if (self._motor.dentroCeldas(fila,columna) and self._motor.obtenerValorCelda(fila,columna) == 0):
                             
                             #Comprobar si hay fichas que han quedado encerradas
-                            celdas = motor.fichasContrariasEncerradas(fila,columna)
+                            celdas = self._motor.fichasContrariasEncerradas(fila,columna)
 
                             if (len(celdas) > 0):
 
                                 #Indicar que jugador coloca la ficha en el tablero
-                                motor.modificarValorCelda(fila,columna,motor.getJugadorActivo().getTurno())
-                                motor.aumentaCantidadFichasJugador(motor.getJugadorActivo())
+                                self._motor.modificarValorCelda(fila,columna,self._motor.getJugadorActivo().getTurno())
+                                self._motor.aumentaCantidadFichasJugador(self._motor.getJugadorActivo())
                                 
                                 #Colocar ficha del jugador en la interfaz
-                                colorFicha = self.obtenerFichaJugador(motor)
+                                colorFicha = self.obtenerFichaJugador()
                                 self.colocarFicha(colorFicha,fila,columna)  
 
                                 #Indicar movimiento realizado     
-                                self.indicarMovimiento(motor.getJugadorActivo().getTurno(),fila,columna)
+                                self.indicarMovimiento(self._motor.getJugadorActivo().getTurno(),fila,columna)
 
                                 #Capturar fichas enemigas
-                                motor.cambiarValorFichasEncerradas(celdas)
-                                self.cambiarFichasEncerradas(motor, celdas)
-                                motor.modificarCantidadFichasJugador(motor.getJugadorActivo(), len(celdas))
+                                self._motor.cambiarValorFichasEncerradas(celdas)
+                                self.cambiarFichasEncerradas(celdas)
+                                self._motor.modificarCantidadFichasJugador(self._motor.getJugadorActivo(), len(celdas))
 
                                 #Turno del siguiente jugador
-                                motor.cambiarTurno(motor.getJugadorActivo())
-                                self.indicarCambioDeTurno(motor.getJugadorActivo().getTurno())
+                                self._motor.cambiarTurno(self._motor.getJugadorActivo())
+                                self.indicarCambioDeTurno(self._motor.getJugadorActivo().getTurno())
 
-                                print(motor.getTablero())
+                                print(self._motor.getTablero())
                                 print(f"Columna: {columna}, fila: {fila}")
+
+    def juega(self):
+        """Inicia el juego (incluida la inicialización del tablero)"""
+
+        while(True):
+            self.gestionEventos()
 
 
                          

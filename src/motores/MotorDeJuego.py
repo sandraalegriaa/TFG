@@ -6,7 +6,6 @@ from typing import Optional
 
 import Constantes as c
 from jugadores import Jugador
-from interfaces import InterfazOthello
 @dataclass
 class MotorDeJuego ():
 
@@ -168,12 +167,6 @@ class MotorDeJuego ():
         else: 
             self.setJugadorActivo(self._jugador1)
             #print("Cambio de turno a jugador 1")      
-    
-    def juega(self, interfaz: InterfazOthello):
-        """Inicia el juego (incluida la inicialización del tablero)"""
-
-        while(True):
-            interfaz.gestionEventos(self)
     
     def obtenerJugadorContario(self,jugador:Jugador):
         """Obtener jugador contrario"""

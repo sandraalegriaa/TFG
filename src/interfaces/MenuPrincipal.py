@@ -163,8 +163,8 @@ class MenuPrincipal ():
                         self._jugador1 = JugadorHumano(c.NEGRO,c.P1)
                         self._jugador2 = JugadorHumano(c.BLANCO,c.P2)
                         self._juego = MotorDeJuego(self._jugador1, self._jugador2)
-                        self._interfazOthello = InterfazOthello()
-                        self._juego.juega(self._interfazOthello)
+                        self._interfazOthello = InterfazOthello(self._juego)
+                        self._interfazOthello.juega()
                         print("Botón Jugador vs Jugador presionado")
                         self._cerrarVentana = True
                     elif self._botonJugadorIA.collidepoint(event.pos):
