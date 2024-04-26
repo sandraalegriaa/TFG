@@ -26,11 +26,11 @@ def juegaUnaPartida(jugador1:JugadorInteligente,jugador2:JugadorInteligente,jueg
                 i+= 1
                 inicio_tiempo = time.time()
                 if (juego.getJugadorActivo() == jugador1):
-                    movimiento = jugador1.eligeMovimiento(juego)
+                    movimiento = jugador1.eligeMovimientoTablaTrasposicion(juego)
                     t1 = time.time() - inicio_tiempo
                     tiempos_jugador1.append(t1)
                 else:
-                    movimiento = jugador2.eligeMovimiento(juego)
+                    movimiento = jugador2.eligeMovimientoTablaTrasposicion(juego)
                     t2 = time.time() - inicio_tiempo
                     tiempos_jugador2.append(t2)
 

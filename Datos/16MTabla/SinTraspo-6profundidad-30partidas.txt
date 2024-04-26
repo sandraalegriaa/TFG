@@ -1,0 +1,91 @@
+Partida:0
+NEGRAS;BLANCAS;EMPATES: 1;0;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.98 segundos, Jugador 2: 0.31 segundos
+Partida:1
+NEGRAS;BLANCAS;EMPATES: 2;0;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.12 segundos, Jugador 2: 0.41 segundos
+Partida:2
+NEGRAS;BLANCAS;EMPATES: 3;0;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.60 segundos, Jugador 2: 0.27 segundos
+Partida:3
+NEGRAS;BLANCAS;EMPATES: 4;0;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 2.25 segundos, Jugador 2: 0.46 segundos
+Partida:4
+NEGRAS;BLANCAS;EMPATES: 5;0;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 2.92 segundos, Jugador 2: 0.31 segundos
+Partida:5
+NEGRAS;BLANCAS;EMPATES: 6;0;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.84 segundos, Jugador 2: 0.59 segundos
+Partida:6
+NEGRAS;BLANCAS;EMPATES: 7;0;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.98 segundos, Jugador 2: 0.36 segundos
+Partida:7
+NEGRAS;BLANCAS;EMPATES: 8;0;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.84 segundos, Jugador 2: 0.36 segundos
+Partida:8
+NEGRAS;BLANCAS;EMPATES: 9;0;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.79 segundos, Jugador 2: 0.62 segundos
+Partida:9
+NEGRAS;BLANCAS;EMPATES: 10;0;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.71 segundos, Jugador 2: 0.39 segundos
+Partida:10
+NEGRAS;BLANCAS;EMPATES: 11;0;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 2.20 segundos, Jugador 2: 0.38 segundos
+Partida:11
+NEGRAS;BLANCAS;EMPATES: 11;1;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.53 segundos, Jugador 2: 0.26 segundos
+Partida:12
+NEGRAS;BLANCAS;EMPATES: 11;2;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.94 segundos, Jugador 2: 0.25 segundos
+Partida:13
+NEGRAS;BLANCAS;EMPATES: 12;2;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 2.34 segundos, Jugador 2: 0.48 segundos
+Partida:14
+NEGRAS;BLANCAS;EMPATES: 13;2;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.74 segundos, Jugador 2: 0.32 segundos
+Partida:15
+NEGRAS;BLANCAS;EMPATES: 13;3;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.16 segundos, Jugador 2: 0.29 segundos
+Partida:16
+NEGRAS;BLANCAS;EMPATES: 14;3;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.11 segundos, Jugador 2: 0.13 segundos
+Partida:17
+NEGRAS;BLANCAS;EMPATES: 14;4;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.75 segundos, Jugador 2: 0.32 segundos
+Partida:18
+NEGRAS;BLANCAS;EMPATES: 15;4;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.64 segundos, Jugador 2: 0.33 segundos
+Partida:19
+NEGRAS;BLANCAS;EMPATES: 16;4;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.85 segundos, Jugador 2: 0.33 segundos
+Partida:20
+NEGRAS;BLANCAS;EMPATES: 17;4;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.44 segundos, Jugador 2: 0.50 segundos
+Partida:21
+NEGRAS;BLANCAS;EMPATES: 18;4;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.86 segundos, Jugador 2: 0.22 segundos
+Partida:22
+NEGRAS;BLANCAS;EMPATES: 18;5;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 2.12 segundos, Jugador 2: 0.36 segundos
+Partida:23
+NEGRAS;BLANCAS;EMPATES: 19;5;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.78 segundos, Jugador 2: 0.48 segundos
+Partida:24
+NEGRAS;BLANCAS;EMPATES: 20;5;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.67 segundos, Jugador 2: 0.37 segundos
+Partida:25
+NEGRAS;BLANCAS;EMPATES: 21;5;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 2.20 segundos, Jugador 2: 0.50 segundos
+Partida:26
+NEGRAS;BLANCAS;EMPATES: 21;6;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.79 segundos, Jugador 2: 0.38 segundos
+Partida:27
+NEGRAS;BLANCAS;EMPATES: 22;6;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.95 segundos, Jugador 2: 0.53 segundos
+Partida:28
+NEGRAS;BLANCAS;EMPATES: 23;6;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 1.83 segundos, Jugador 2: 0.41 segundos
+Partida:29
+NEGRAS;BLANCAS;EMPATES: 24;6;0
+Media de tiempo por movimiento en esta partida - Jugador 1: 2.14 segundos, Jugador 2: 0.53 segundos
+Media de tiempo por movimiento de todas las partidas - Jugador 1: 1.83 segundos, Jugador 2: 0.38 segundos
