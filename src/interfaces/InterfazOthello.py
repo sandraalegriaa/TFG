@@ -9,6 +9,7 @@ from tkinter import filedialog
 import os
 from typing import Optional
 from motores import MotorDeJuego
+from jugadores import JugadorInteligente
 from Sprites import Ficha
 from Sprites import FichaSemiTransparente
 
@@ -57,6 +58,8 @@ class InterfazOthello ():
     _terceraColumnaEmpezada: bool
 
     _fin: bool
+
+    _partida_guardada: bool
 
     def __init__(self, motor):
 
@@ -422,6 +425,7 @@ class InterfazOthello ():
 
     def finPartida(self):
 
+        self._partida_guardada = False
         self._fin = True
 
         ganador = self._motor.comprobarGanador()
@@ -472,21 +476,26 @@ class InterfazOthello ():
                 sys.exit()
             if event.type == pg.MOUSEBUTTONDOWN:
                 if self._botonGuardar.collidepoint(event.pos):
+                    if not self._partida_guardada:
                     #Guardar estado del juego
-                    ventanaInvisible = tk.Tk()
-                    ventanaInvisible.withdraw()
+                        ventanaInvisible = tk.Tk()
+                        ventanaInvisible.withdraw()
 
-                    ruta = filedialog.asksaveasfilename(defaultextension=".png",
-                        filetypes=[("PNG files", "*.png"), ("All files", "*.*")],
-                        initialdir=os.getcwd(),  # Directorio inicial: directorio de trabajo actual
-                        title="Guardar como"
-                        )
-                    if ruta:
-                        # Mueve el archivo de la ubicación temporal a la carpeta seleccionada
-                        os.rename(rutaProvisional, ruta)
-                        print(f"Captura guardada en: {ruta}")
+                        ruta = filedialog.asksaveasfilename(defaultextension=".png",
+                            filetypes=[("PNG files", "*.png"), ("All files", "*.*")],
+                            initialdir=os.getcwd(),  # Directorio inicial: directorio de trabajo actual
+                            title="Guardar como"
+                            )
+                        if ruta:
+                            # Mueve el archivo de la ubicación temporal a la carpeta seleccionada
+                            os.rename(rutaProvisional, ruta)
+                            print(f"Captura guardada en: {ruta}")
+                        else:
+                            print("No se seleccionó ninguna carpeta.") 
+
+                        self._partida_guardada = True
                     else:
-                        print("No se seleccionó ninguna carpeta.") 
+                        print("La partida ya ha sido guardada.")
 
     def gestionEventos(self):
         """Gestionar eventos en la interfaz"""
@@ -500,30 +509,33 @@ class InterfazOthello ():
 
         if (not self._fin):
             """El juego sigue en marcha"""
-            #Coordenadas del ratón
-            pos = pg.mouse.get_pos()
+            #Si juega el juegador humano
+            if (not isinstance(self._motor.getJugadorActivo(),JugadorInteligente)):
+                
+                #Coordenadas del ratón
+                pos = pg.mouse.get_pos()
 
-            if(pos != None):
+                if(pos != None):
 
-                #Ocultar cursor dentro del tablero
-                if (self.posicionDentroDelTablero(pos)):
-                    pg.mouse.set_visible(True)
-                else: 
-                    pg.mouse.set_visible(True)
+                    #Ocultar cursor dentro del tablero
+                    if (self.posicionDentroDelTablero(pos)):
+                        pg.mouse.set_visible(True)
+                    else: 
+                        pg.mouse.set_visible(True)
 
-                fila, columna = self.obtenerCelda(pos)
+                    fila, columna = self.obtenerCelda(pos)
 
-            if(self._motor.dentroCeldas(fila,columna) and self._motor.obtenerValorCelda(fila,columna) == 0):
-                if (self._angituaFichaSemitransparente != (fila,columna)):
-                    #Colocar ficha del jugador en la interfaz
-                    colorFicha = self.obtenerFichaJugador()
-                    self.colocarFichaSemitransparente(colorFicha,fila,columna)
+                if(self._motor.dentroCeldas(fila,columna) and self._motor.obtenerValorCelda(fila,columna) == 0):
+                    if (self._angituaFichaSemitransparente != (fila,columna)):
+                        #Colocar ficha del jugador en la interfaz
+                        colorFicha = self.obtenerFichaJugador()
+                        self.colocarFichaSemitransparente(colorFicha,fila,columna)
 
-                    #Eliminar antigua ficha semitransparente colocada
-                    if (self._angituaFichaSemitransparente != None and self._motor.obtenerValorCelda(self._angituaFichaSemitransparente[0],self._angituaFichaSemitransparente[1]) == 0):
-                        self.eliminarFichaSemitrasparente(self._angituaFichaSemitransparente[0], self._angituaFichaSemitransparente[1])
+                        #Eliminar antigua ficha semitransparente colocada
+                        if (self._angituaFichaSemitransparente != None and self._motor.obtenerValorCelda(self._angituaFichaSemitransparente[0],self._angituaFichaSemitransparente[1]) == 0):
+                            self.eliminarFichaSemitrasparente(self._angituaFichaSemitransparente[0], self._angituaFichaSemitransparente[1])
 
-                    self._angituaFichaSemitransparente = (fila,columna)
+                        self._angituaFichaSemitransparente = (fila,columna)
 
             if (not self._motor.comprobarPosiblesMovimientos()):
                 print("NO PUEDE COLOCAR, CAMBIAR TURNO AL SIGUIENTE")
@@ -535,50 +547,89 @@ class InterfazOthello ():
             if (self._motor.comprobarFinJuego()):
                 self.finPartida()
 
+            if (isinstance(self._motor.getJugadorActivo(),JugadorInteligente)):
+                #Jugador inteligente
+                    jugadorInteligente = self._motor.getJugadorActivo()
+                    movimiento = jugadorInteligente.eligeMovimientoTablaTrasposicion(self._motor)
+
+                    fila = movimiento[0]
+                    columna = movimiento[1]
+                    #Comprobar si hay fichas que han quedado encerradas
+                    celdas = self._motor.fichasContrariasEncerradas(fila,columna)
+
+                    if (len(celdas) > 0):
+
+                        #Indicar que jugador coloca la ficha en el tablero
+                        self._motor.modificarValorCelda(fila,columna,jugadorInteligente.getTurno())
+                        self._motor.aumentaCantidadFichasJugador(jugadorInteligente)
+                        
+                        #Colocar ficha del jugador en la interfaz
+                        colorFicha = self.obtenerFichaJugador()
+                        self.colocarFicha(colorFicha,fila,columna)  
+
+                        #Indicar movimiento realizado     
+                        self.indicarMovimiento(jugadorInteligente.getTurno(),fila,columna)
+
+                        #Capturar fichas enemigas
+                        self._motor.cambiarValorFichasEncerradas(celdas)
+                        self.cambiarFichasEncerradas(celdas)
+                        self._motor.modificarCantidadFichasJugador(jugadorInteligente, len(celdas))
+
+                        #Turno del siguiente jugador
+                        self._motor.cambiarTurno(self._motor.getJugadorActivo())
+                        self.indicarCambioDeTurno(self._motor.getJugadorActivo().getTurno())
+
+                        print(self._motor.getTablero())
+                        print(f"Columna: {columna}, fila: {fila}")
+
             for event in pg.event.get():
                 #Cerrar ventana
                 if event.type == pg.QUIT:
                     pg.quit()
                     sys.exit()
-                #Click del raton
-                elif event.type == pg.MOUSEBUTTONDOWN:
-                    #Coordenadas del click
-                    pos = pg.mouse.get_pos()
-                    if (pos != None):
-                        #Obtener celda
-                        fila, columna = self.obtenerCelda(pos)
-                        print(pos)
-                        print()
-                        #Colocacion de las fichas
-                        if (self._motor.dentroCeldas(fila,columna) and self._motor.obtenerValorCelda(fila,columna) == 0):
-                            
-                            #Comprobar si hay fichas que han quedado encerradas
-                            celdas = self._motor.fichasContrariasEncerradas(fila,columna)
-
-                            if (len(celdas) > 0):
-
-                                #Indicar que jugador coloca la ficha en el tablero
-                                self._motor.modificarValorCelda(fila,columna,self._motor.getJugadorActivo().getTurno())
-                                self._motor.aumentaCantidadFichasJugador(self._motor.getJugadorActivo())
+                
+                #Jugador humano
+                if not isinstance(self._motor.getJugadorActivo(),JugadorInteligente):
+                    #Click del raton
+                    if event.type == pg.MOUSEBUTTONDOWN:
+                        #Coordenadas del click
+                        pos = pg.mouse.get_pos()
+                        if (pos != None):
+                            #Obtener celda
+                            fila, columna = self.obtenerCelda(pos)
+                            print(pos)
+                            print()
+                            #Colocacion de las fichas
+                            if (self._motor.dentroCeldas(fila,columna) and self._motor.obtenerValorCelda(fila,columna) == 0):
                                 
-                                #Colocar ficha del jugador en la interfaz
-                                colorFicha = self.obtenerFichaJugador()
-                                self.colocarFicha(colorFicha,fila,columna)  
+                                #Comprobar si hay fichas que han quedado encerradas
+                                celdas = self._motor.fichasContrariasEncerradas(fila,columna)
 
-                                #Indicar movimiento realizado     
-                                self.indicarMovimiento(self._motor.getJugadorActivo().getTurno(),fila,columna)
+                                if (len(celdas) > 0):
 
-                                #Capturar fichas enemigas
-                                self._motor.cambiarValorFichasEncerradas(celdas)
-                                self.cambiarFichasEncerradas(celdas)
-                                self._motor.modificarCantidadFichasJugador(self._motor.getJugadorActivo(), len(celdas))
+                                    #Indicar que jugador coloca la ficha en el tablero
+                                    self._motor.modificarValorCelda(fila,columna,self._motor.getJugadorActivo().getTurno())
+                                    self._motor.aumentaCantidadFichasJugador(self._motor.getJugadorActivo())
+                                    
+                                    #Colocar ficha del jugador en la interfaz
+                                    colorFicha = self.obtenerFichaJugador()
+                                    self.colocarFicha(colorFicha,fila,columna)  
 
-                                #Turno del siguiente jugador
-                                self._motor.cambiarTurno(self._motor.getJugadorActivo())
-                                self.indicarCambioDeTurno(self._motor.getJugadorActivo().getTurno())
+                                    #Indicar movimiento realizado     
+                                    self.indicarMovimiento(self._motor.getJugadorActivo().getTurno(),fila,columna)
 
-                                print(self._motor.getTablero())
-                                print(f"Columna: {columna}, fila: {fila}")
+                                    #Capturar fichas enemigas
+                                    self._motor.cambiarValorFichasEncerradas(celdas)
+                                    self.cambiarFichasEncerradas(celdas)
+                                    self._motor.modificarCantidadFichasJugador(self._motor.getJugadorActivo(), len(celdas))
+
+                                    #Turno del siguiente jugador
+                                    self._motor.cambiarTurno(self._motor.getJugadorActivo())
+                                    self.indicarCambioDeTurno(self._motor.getJugadorActivo().getTurno())
+
+                                    print(self._motor.getTablero())
+                                    print(f"Columna: {columna}, fila: {fila}")
+                
 
     def juega(self):
         """Inicia el juego (incluida la inicialización del tablero)"""

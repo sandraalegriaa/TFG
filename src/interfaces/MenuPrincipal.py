@@ -9,6 +9,7 @@ from motores import MotorDeJuego
 from motores import MotorDeJuego
 from interfaces import InterfazOthello
 from jugadores import JugadorHumano
+from jugadores import JugadorInteligente
 from jugadores import Jugador
 
 @dataclass
@@ -168,7 +169,13 @@ class MenuPrincipal ():
                         print("Botón Jugador vs Jugador presionado")
                         self._cerrarVentana = True
                     elif self._botonJugadorIA.collidepoint(event.pos):
-                        print("Botón 2 presionado")
+                        #Crear dos jugadores (uno humano y uno inteligente)
+                        self._jugador1 = JugadorHumano(c.NEGRO,c.P1)
+                        self._jugador2 = JugadorInteligente(c.BLANCO,c.P2,c.EVALUADOR_COMBINADO)
+                        self._juego = MotorDeJuego(self._jugador1, self._jugador2)
+                        self._interfazOthello = InterfazOthello(self._juego)
+                        self._interfazOthello.juega()
+                        print("Botón Jugador vs Jugador presionado")
                         self._cerrarVentana = True
 
         if (not self._cerrarVentana):
