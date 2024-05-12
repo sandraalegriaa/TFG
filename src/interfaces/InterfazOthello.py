@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-
+import time
 import Constantes as c
 import pygame as pg
 import sys
@@ -73,6 +73,8 @@ class InterfazOthello ():
 
         #Cargar assets de la interfaz
         self._asset_fondo, self._asset_tablero, self._asset_blanca_turno, self._asset_negra_turno, self._asset_blanca_movimiento, self._asset_negra_movimiento, self._asset_tapar_texto, self._assetBoton, self._assetBotonEncima, self._asset_celda_oscura, self._asset_celda_clara, self._asset_guardar_partida = self.cargarImagenes()
+
+        self._efectoFichas = pg.mixer.Sound(c.SONIDO)
 
         #Incializar assets fichas
         Ficha.cargarImagenes()
@@ -291,8 +293,10 @@ class InterfazOthello ():
 
         colorFicha = self.obtenerFichaJugador()
 
+        time.sleep(0.5)
         for [fila,columna] in celdas:
             self.colocarFicha(colorFicha,fila,columna)
+            time.sleep(0.2)
 
     def dibujarTextoEspaciadoTurno(self,texto,espaciado,color):
         """Dibujar en la interfaz el texto indicador del turno espaciado"""
@@ -422,6 +426,10 @@ class InterfazOthello ():
         y = pos[1]
 
         return (x >= c.ORIGEN_TABLERO['x'] and x <= c.FIN_TABLERO['x']) and (y >= c.ORIGEN_TABLERO['y'] and y <= c.FIN_TABLERO['y'])
+
+    def sonidoColocarFichas(self):
+        
+        self._efectoFichas.play()
 
     def finPartida(self):
 
@@ -564,6 +572,7 @@ class InterfazOthello ():
                         self._motor.aumentaCantidadFichasJugador(jugadorInteligente)
                         
                         #Colocar ficha del jugador en la interfaz
+                        self.sonidoColocarFichas()
                         colorFicha = self.obtenerFichaJugador()
                         self.colocarFicha(colorFicha,fila,columna)  
 
@@ -612,6 +621,7 @@ class InterfazOthello ():
                                     self._motor.aumentaCantidadFichasJugador(self._motor.getJugadorActivo())
                                     
                                     #Colocar ficha del jugador en la interfaz
+                                    self.sonidoColocarFichas()
                                     colorFicha = self.obtenerFichaJugador()
                                     self.colocarFicha(colorFicha,fila,columna)  
 

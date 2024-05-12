@@ -55,6 +55,7 @@ IMG_TAPA_TEXTO = "../Assets/Tapar-Texto.png"
 IMG_CELDA_OSCURA = "../Assets/Celda-Oscura.png"
 IMG_CELDA_CLARA = "../Assets/Celda-Clara.png"
 IMG_GUARDAR_PARTIDA = "../Assets/Guardar-Partida.png"
+SONIDO =  "../Audio/drop2.wav"
 
 #Fichas
 FICHA_BLANCA = 'blanca'
